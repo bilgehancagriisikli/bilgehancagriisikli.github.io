@@ -4,14 +4,120 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Benim ilk websitem</title>
+    <style>
+        body { font-family: sans-serif; text-align: center; background-color: #f0f0f0; }
+        
+        /* Hesap Makinesi Gövdesi */
+        .calculator {
+            width: 260px;
+            background-color: #333;
+            padding: 20px;
+            border-radius: 20px;
+            box-shadow: 0px 10px 20px rgba(0,0,0,0.3);
+            display: inline-block;
+            margin-top: 20px;
+        }
+
+        /* Ekran Kısmı */
+        #display {
+            width: 100%;
+            height: 50px;
+            font-size: 24px;
+            text-align: right;
+            margin-bottom: 10px;
+            padding: 10px;
+            box-sizing: border-box;
+            background: #eee;
+            border: none;
+            border-radius: 5px;
+        }
+
+        /* Butonların Düzeni */
+        .buttons {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 10px;
+        }
+
+        button {
+            padding: 15px;
+            font-size: 18px;
+            border: none;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: 0.2s;
+        }
+
+        button:hover { opacity: 0.8; }
+
+        /* Renkler */
+        .number { background-color: #666; color: white; }
+        .operator { background-color: #f39c12; color: white; }
+        .clear { background-color: #e74c3c; color: white; grid-column: span 2; }
+        .equal { background-color: #27ae60; color: white; grid-column: span 2; }
+    </style>
 </head>
 <body>
+
     <h1>Merhaba Dünya!</h1>
     <p>Ben Bilgehan Çağrı Işıklı. Websiteme Hoşgeldiniz.</p>
-</body>
-<body>
-<img src="chinchilla-ninja.gif" alt="Hareketli bir Chinchilla görseli">
-<img src="hamster-eating-carrots.gif" alt="Hareketli bir Hamster görseli">
-<img src="rubix-cube.gif" alt="Hareketli bir rubix cube görseli">
+
+    <img src="chinchilla-ninja.gif" alt="Chinchilla" width="150">
+    <img src="hamster-eating-carrots.gif" alt="Hamster" width="150">
+    <img src="rubix-cube.gif" alt="Rubix" width="150">
+
+    <br>
+
+    <div class="calculator">
+        <input type="text" id="display" disabled value="0">
+        <div class="buttons">
+            <button class="clear" onclick="temizle()">C (Temizle)</button>
+            <button class="operator" onclick="ekle('/')">/</button>
+            <button class="operator" onclick="ekle('*')">x</button>
+            
+            <button class="number" onclick="ekle('7')">7</button>
+            <button class="number" onclick="ekle('8')">8</button>
+            <button class="number" onclick="ekle('9')">9</button>
+            <button class="operator" onclick="ekle('-')">-</button>
+            
+            <button class="number" onclick="ekle('4')">4</button>
+            <button class="number" onclick="ekle('5')">5</button>
+            <button class="number" onclick="ekle('6')">6</button>
+            <button class="operator" onclick="ekle('+')">+</button>
+            
+            <button class="number" onclick="ekle('1')">1</button>
+            <button class="number" onclick="ekle('2')">2</button>
+            <button class="number" onclick="ekle('3')">3</button>
+            <button class="number" onclick="ekle('0')">0</button>
+            
+            <button class="equal" onclick="hesapla()">=</button>
+        </div>
+    </div>
+
+    <script>
+        let display = document.getElementById('display');
+
+        function ekle(deger) {
+            if (display.value === "0") {
+                display.value = deger;
+            } else {
+                display.value += deger;
+            }
+        }
+
+        function temizle() {
+            display.value = "0";
+        }
+
+        function hesapla() {
+            try {
+                // eval fonksiyonu string içindeki işlemi matematiksel olarak çözer
+                display.value = eval(display.value);
+            } catch (e) {
+                display.value = "Hata!";
+            }
+        }
+    </script>
+
 </body>
 </html>
