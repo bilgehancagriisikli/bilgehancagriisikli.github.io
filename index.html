@@ -5,56 +5,42 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Benim ilk websitem</title>
     <style>
-        body { font-family: sans-serif; text-align: center; background-color: #f0f0f0; }
+        body { font-family: 'Segoe UI', sans-serif; text-align: center; background-color: #f4f7f6; }
         
-        /* Hesap Makinesi Gövdesi */
-        .calculator {
-            width: 260px;
-            background-color: #333;
+        .calculator-container {
+            background-color: #2c3e50;
             padding: 20px;
-            border-radius: 20px;
-            box-shadow: 0px 10px 20px rgba(0,0,0,0.3);
+            border-radius: 15px;
+            box-shadow: 0px 8px 20px rgba(0,0,0,0.3);
             display: inline-block;
-            margin-top: 20px;
+            margin: 15px;
+            width: 280px;
+            color: white;
         }
 
-        /* Ekran Kısmı */
-        #display {
-            width: 100%;
-            height: 50px;
-            font-size: 24px;
-            text-align: right;
-            margin-bottom: 10px;
-            padding: 10px;
+        input { 
+            width: 100%; 
+            height: 45px; 
+            font-size: 22px; 
+            text-align: right; 
+            margin-bottom: 15px; 
+            border-radius: 5px; 
+            border: none; 
+            padding: 5px; 
             box-sizing: border-box;
-            background: #eee;
-            border: none;
-            border-radius: 5px;
+            background: #ecf0f1;
         }
+        
+        .buttons { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; }
 
-        /* Butonların Düzeni */
-        .buttons {
-            display: grid;
-            grid-template-columns: repeat(4, 1fr);
-            gap: 10px;
-        }
-
-        button {
-            padding: 15px;
-            font-size: 18px;
-            border: none;
-            border-radius: 10px;
-            cursor: pointer;
-            transition: 0.2s;
-        }
-
+        button { padding: 12px; font-size: 16px; border: none; border-radius: 8px; cursor: pointer; font-weight: bold; transition: 0.2s; }
         button:hover { opacity: 0.8; }
 
-        /* Renkler */
-        .number { background-color: #666; color: white; }
-        .operator { background-color: #f39c12; color: white; }
-        .clear { background-color: #e74c3c; color: white; grid-column: span 2; }
-        .equal { background-color: #27ae60; color: white; grid-column: span 2; }
+        .num { background: #7f8c8d; color: white; }
+        .op { background: #f39c12; color: white; }
+        .bin { background: #3498db; color: white; }
+        .clear { background: #e74c3c; color: white; }
+        .equal { background: #27ae60; color: white; }
     </style>
 </head>
 <body>
@@ -62,59 +48,82 @@
     <h1>Merhaba Dünya!</h1>
     <p>Ben Bilgehan Çağrı Işıklı. Websiteme Hoşgeldiniz.</p>
 
-    <img src="chinchilla-ninja.gif" alt="Chinchilla" width="150">
-    <img src="hamster-eating-carrots.gif" alt="Hamster" width="150">
-    <img src="rubix-cube.gif" alt="Rubix" width="150">
+    <div>
+        <img src="chinchilla-ninja.gif" alt="Chinchilla" width="100">
+        <img src="hamster-eating-carrots.gif" alt="Hamster" width="100">
+        <img src="rubix-cube.gif" alt="Rubix" width="100">
+    </div>
 
-    <br>
-    <p>10'luk Sayı sisteminde Hesap Makinesi</p>
-    <div class="calculator">
+    <div class="calculator-container">
+        <h3>Normal Hesap Makinesi</h3>
         <input type="text" id="display" disabled value="0">
         <div class="buttons">
-            <button class="clear" onclick="temizle()">C (Temizle)</button>
-            <button class="operator" onclick="ekle('/')">/</button>
-            <button class="operator" onclick="ekle('*')">x</button>
-            
-            <button class="number" onclick="ekle('7')">7</button>
-            <button class="number" onclick="ekle('8')">8</button>
-            <button class="number" onclick="ekle('9')">9</button>
-            <button class="operator" onclick="ekle('-')">-</button>
-            
-            <button class="number" onclick="ekle('4')">4</button>
-            <button class="number" onclick="ekle('5')">5</button>
-            <button class="number" onclick="ekle('6')">6</button>
-            <button class="operator" onclick="ekle('+')">+</button>
-            
-            <button class="number" onclick="ekle('1')">1</button>
-            <button class="number" onclick="ekle('2')">2</button>
-            <button class="number" onclick="ekle('3')">3</button>
-            <button class="number" onclick="ekle('0')">0</button>
-            
-            <button class="equal" onclick="hesapla()">=</button>
+            <button class="clear" style="grid-column: span 2;" onclick="temizle()">Temizle</button>
+            <button class="op" onclick="ekle('/')">/</button>
+            <button class="op" onclick="ekle('*')">x</button>
+            <button class="num" onclick="ekle('7')">7</button>
+            <button class="num" onclick="ekle('8')">8</button>
+            <button class="num" onclick="ekle('9')">9</button>
+            <button class="op" onclick="ekle('-')">-</button>
+            <button class="num" onclick="ekle('4')">4</button>
+            <button class="num" onclick="ekle('5')">5</button>
+            <button class="num" onclick="ekle('6')">6</button>
+            <button class="op" onclick="ekle('+')">+</button>
+            <button class="num" onclick="ekle('1')">1</button>
+            <button class="num" onclick="ekle('2')">2</button>
+            <button class="num" onclick="ekle('3')">3</button>
+            <button class="equal" style="grid-row: span 2; height: 100%;" onclick="hesapla()">=</button>
+            <button class="num" style="grid-column: span 3;" onclick="ekle('0')">0</button>
+        </div>
+    </div>
+    <br>
+    <div class="calculator-container" style="background-color: #1a252f;">
+        <h3>2'lik Sistem (Binary)</h3>
+        <input type="text" id="binDisplay" disabled value="0">
+        <div class="buttons">
+            <button class="bin" style="grid-column: span 2;" onclick="binEkle('1')">1</button>
+            <button class="bin" style="grid-column: span 2;" onclick="binEkle('0')">0</button>
+            <button class="op" onclick="binEkle('+')">+</button>
+            <button class="op" onclick="binEkle('-')">-</button>
+            <button class="op" onclick="binEkle('*')">x</button>
+            <button class="op" onclick="binEkle('/')">/</button>
+            <button class="clear" style="grid-column: span 2;" onclick="binTemizle()">Temizle</button>
+            <button class="equal" style="grid-column: span 2;" onclick="binHesapla()">=</button>
         </div>
     </div>
 
     <script>
-        let display = document.getElementById('display');
-
-        function ekle(deger) {
-            if (display.value === "0") {
-                display.value = deger;
-            } else {
-                display.value += deger;
-            }
+        // Standart Fonksiyonlar
+        function ekle(v) { 
+            let d = document.getElementById('display');
+            if(d.value === "0") d.value = v; else d.value += v; 
+        }
+        function temizle() { document.getElementById('display').value = "0"; }
+        function hesapla() { 
+            try { document.getElementById('display').value = eval(document.getElementById('display').value); } 
+            catch { document.getElementById('display').value = "Hata"; }
         }
 
-        function temizle() {
-            display.value = "0";
+        // Binary Fonksiyonlar
+        function binEkle(v) {
+            let d = document.getElementById('binDisplay');
+            if(d.value === "0") d.value = v; else d.value += v;
         }
-
-        function hesapla() {
+        function binTemizle() { document.getElementById('binDisplay').value = "0"; }
+        
+        function binHesapla() {
             try {
-                // eval fonksiyonu string içindeki işlemi matematiksel olarak çözer
-                display.value = eval(display.value);
-            } catch (e) {
-                display.value = "Hata!";
+                let exp = document.getElementById('binDisplay').value;
+                // Binary'den 10'luğa çevirip hesapla (Çarpma ve bölme dahil)
+                let result = eval(exp.replace(/[01]+/g, (n) => parseInt(n, 2)));
+                
+                // Tam sayıya yuvarlıyoruz (Binary bölmede küsuratla uğraşmamak için)
+                result = Math.floor(result);
+                
+                // 10'luktan tekrar Binary'ye çevir
+                document.getElementById('binDisplay').value = result.toString(2);
+            } catch {
+                document.getElementById('binDisplay').value = "Hata";
             }
         }
     </script>
