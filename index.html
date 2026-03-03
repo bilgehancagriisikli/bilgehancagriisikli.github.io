@@ -5,16 +5,17 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Benim ilk websitem</title>
     <style>
-        body { font-family: 'Segoe UI', sans-serif; text-align: center; background-color: #f4f7f6; }
+        body { font-family: 'Segoe UI', sans-serif; text-align: center; background-color: #f4f7f6; padding: 20px; }
         
         .calculator-container {
             background-color: #2c3e50;
             padding: 20px;
             border-radius: 15px;
             box-shadow: 0px 8px 20px rgba(0,0,0,0.3);
-            display: inline-block;
-            margin: 15px;
-            width: 280px;
+            /* Alt alta gelmesi için block yapıp margin ile ortaladık */
+            display: block; 
+            margin: 30px auto; 
+            width: 300px;
             color: white;
         }
 
@@ -41,6 +42,9 @@
         .bin { background: #3498db; color: white; }
         .clear { background: #e74c3c; color: white; }
         .equal { background: #27ae60; color: white; }
+        .convert { background: #9b59b6; color: white; margin-bottom: 5px; }
+
+        .image-gallery img { margin: 5px; border-radius: 10px; box-shadow: 0 4px 8px rgba(0,0,0,0.1); }
     </style>
 </head>
 <body>
@@ -48,12 +52,14 @@
     <h1>Merhaba Dünya!</h1>
     <p>Ben Bilgehan Çağrı Işıklı. Websiteme Hoşgeldiniz.</p>
 
-    <div>
-        <img src="chinchilla-ninja.gif" alt="Chinchilla" width="200">
-        <img src="hamster-eating-carrots.gif" alt="Hamster" width="200">
-        <img src="rubix-cube.gif" alt="Rubix" width="200">
-        <img src="lego-logo.gif" alt="Rubix" width="200">
+    <div class="image-gallery">
+        <img src="chinchilla-ninja.gif" alt="Chinchilla" width="150">
+        <img src="hamster-eating-carrots.gif" alt="Hamster" width="150">
+        <img src="rubix-cube.gif" alt="Rubix" width="150">
+        <img src="lego-logo.gif" alt="Lego" width="150">
     </div>
+
+    <hr style="width: 50%; margin: 40px auto; border: 0.5px solid #ccc;">
 
     <div class="calculator-container">
         <h3>Normal Hesap Makinesi</h3>
@@ -77,9 +83,9 @@
             <button class="num" style="grid-column: span 3;" onclick="ekle('0')">0</button>
         </div>
     </div>
-    <br>
+
     <div class="calculator-container" style="background-color: #1a252f;">
-        <h3>2'lik Sistem (Binary)</h3>
+        <h3>2'lik Sistem (Binary) İşlemci</h3>
         <input type="text" id="binDisplay" disabled value="0">
         <div class="buttons">
             <button class="bin" style="grid-column: span 2;" onclick="binEkle('1')">1</button>
@@ -93,8 +99,19 @@
         </div>
     </div>
 
+    <div class="calculator-container" style="background-color: #273c75;">
+        <h3>Taban Dönüştürücü</h3>
+        <input type="text" id="convDisplay" placeholder="Sayı girin...">
+        <div class="buttons" style="grid-template-columns: 1fr;">
+            <button class="convert" onclick="toBinary()">10'luk -> 2'lik (Binary)</button>
+            <button class="convert" onclick="toDecimal()">2'lik (Binary) -> 10'luk</button>
+            <button class="clear" onclick="convTemizle()">Temizle</button>
+        </div>
+        <p id="convResult" style="margin-top:15px; font-weight:bold; color:#fbc531; min-height: 20px;"></p>
+    </div>
+
     <script>
-        // Standart Fonksiyonlar
+        // Standart Hesaplama
         function ekle(v) { 
             let d = document.getElementById('display');
             if(d.value === "0") d.value = v; else d.value += v; 
@@ -105,27 +122,38 @@
             catch { document.getElementById('display').value = "Hata"; }
         }
 
-        // Binary Fonksiyonlar
+        // Binary İşlemler
         function binEkle(v) {
             let d = document.getElementById('binDisplay');
             if(d.value === "0") d.value = v; else d.value += v;
         }
         function binTemizle() { document.getElementById('binDisplay').value = "0"; }
-        
         function binHesapla() {
             try {
                 let exp = document.getElementById('binDisplay').value;
-                // Binary'den 10'luğa çevirip hesapla (Çarpma ve bölme dahil)
                 let result = eval(exp.replace(/[01]+/g, (n) => parseInt(n, 2)));
-                
-                // Tam sayıya yuvarlıyoruz (Binary bölmede küsuratla uğraşmamak için)
-                result = Math.floor(result);
-                
-                // 10'luktan tekrar Binary'ye çevir
-                document.getElementById('binDisplay').value = result.toString(2);
-            } catch {
-                document.getElementById('binDisplay').value = "Hata";
+                document.getElementById('binDisplay').value = Math.floor(result).toString(2);
+            } catch { document.getElementById('binDisplay').value = "Hata"; }
+        }
+
+        // Dönüştürücü
+        function convTemizle() {
+            document.getElementById('convDisplay').value = "";
+            document.getElementById('convResult').innerText = "";
+        }
+        function toBinary() {
+            let val = document.getElementById('convDisplay').value;
+            let num = parseInt(val, 10);
+            if(isNaN(num)) document.getElementById('convResult').innerText = "Geçersiz Sayı!";
+            else document.getElementById('convResult').innerText = "Binary: " + num.toString(2);
+        }
+        function toDecimal() {
+            let val = document.getElementById('convDisplay').value;
+            if (!/^[01]+$/.test(val)) {
+                document.getElementById('convResult').innerText = "Sadece 0 ve 1 girin!";
+                return;
             }
+            document.getElementById('convResult').innerText = "Decimal: " + parseInt(val, 2);
         }
     </script>
 
