@@ -130,4 +130,126 @@
     </script>
 
 </body>
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Binary - Decimal Çevirici</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+            background-color: #f0f2f5;
+        }
+
+        .converter-card {
+            background: white;
+            padding: 2rem;
+            border-radius: 12px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+            width: 100%;
+            max-width: 400px;
+        }
+
+        h2 {
+            color: #1a73e8;
+            text-align: center;
+            margin-top: 0;
+        }
+
+        .input-group {
+            margin-bottom: 1.5rem;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-weight: bold;
+            color: #444;
+        }
+
+        input {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #ddd;
+            border-radius: 6px;
+            font-size: 1rem;
+            box-sizing: border-box;
+            transition: border-color 0.3s;
+        }
+
+        input:focus {
+            border-color: #1a73e8;
+            outline: none;
+        }
+
+        .result-box {
+            background: #e8f0fe;
+            padding: 1rem;
+            border-radius: 6px;
+            text-align: center;
+            min-height: 50px;
+        }
+
+        .result-text {
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: #1a73e8;
+            margin: 0;
+        }
+
+        .error {
+            color: #d93025;
+            font-size: 0.85rem;
+            margin-top: 0.5rem;
+            display: none;
+        }
+    </style>
+</head>
+<body>
+
+<div class="converter-card">
+    <h2>Sayı Çevirici</h2>
+    
+    <div class="input-group">
+        <label for="binaryInput">İkilik (Binary) Sayı:</label>
+        <input type="text" id="binaryInput" placeholder="Örn: 101010" oninput="convertToDecimal()">
+        <p id="errorMessage" class="error">Lütfen sadece 0 veya 1 giriniz!</p>
+    </div>
+
+    <div class="result-box">
+        <label>Onluk (Decimal) Karşılığı:</label>
+        <p id="decimalResult" class="result-text">0</p>
+    </div>
+</div>
+
+<script>
+    function convertToDecimal() {
+        const binaryInput = document.getElementById('binaryInput').value;
+        const resultElement = document.getElementById('decimalResult');
+        const errorElement = document.getElementById('errorMessage');
+
+        // Sadece 0 ve 1 kontrolü (Regex)
+        if (/^[01]*$/.test(binaryInput)) {
+            errorElement.style.display = 'none';
+            if (binaryInput === "") {
+                resultElement.innerText = "0";
+            } else {
+                // parseInt(sayı, taban) fonksiyonu çeviriyi yapar
+                const decimal = parseInt(binaryInput, 2);
+                resultElement.innerText = decimal;
+            }
+        } else {
+            errorElement.style.display = 'block';
+            resultElement.innerText = "-";
+        }
+    }
+</script>
+
+</body>
+
 </html>
