@@ -103,10 +103,13 @@
         <h3>Taban Dönüştürücü</h3>
         <input type="text" id="convDisplay" placeholder="Sayı girin...">
         <div class="buttons" style="grid-template-columns: 1fr;">
-            <button class="convert" onclick="toBinary()">10'luk -> 2'lik (Binary)</button>
-            <button class="convert" onclick="toDecimal()">2'lik (Binary) -> 10'luk</button>
-            <button class="convert" onclick="hexToBinary()">16'lık (Hex) -> 2'lik (Binary)</button>
-            <button class="convert" onclick="binToHex()">2'lik (Binary) -> 16'lık (Hex)</button>
+            <button class="convert" onclick="toBinary()">10'luk (Decimal) &#10142; 2'lik (Binary)</button>
+            <button class="convert" onclick="toDecimal()">2'lik (Binary) &#10142; 10'luk (Decimal)</button>
+            <button class="convert" onclick="hexToBinary()">16'lık (Hex) &#10142; 2'lik (Binary)</button>
+            <button class="convert" onclick="binToHex()">2'lik (Binary) &#10142; 16'lık (Hex)</button>
+            <button class="convert" onclick="toOctal()">10'luk (Decimal) &#10142; 8'lik (Octal)</button>
+            <button class="convert" onclick="octToDecimal()">8'lik (Octal) &#10142; 10'luk (Decimal)</button>
+            
             <button class="clear" onclick="convTemizle()">Temizle</button>
         </div>
         <p id="convResult" style="margin-top:15px; font-weight:bold; color:#fbc531; min-height: 20px;"></p>
@@ -184,6 +187,29 @@ function binToHex() {
     // toUpperCase() ile harflerin büyük (A, B, C...) görünmesini sağlıyoruz
     document.getElementById('convResult').innerText = "16'lık(Hex) sonucu: " + decimal.toString(16).toUpperCase();
 }
+// 10'luk -> 8'lik (Octal)
+function toOctal() {
+    let val = document.getElementById('convDisplay').value.trim();
+    if (!/^\d+$/.test(val)) {
+        document.getElementById('convResult').innerText = "Hata: Sadece rakam girin!";
+        return;
+    }
+    let num = parseInt(val, 10);
+    document.getElementById('convResult').innerText = "8'lik (Octal) sonucu: " + num.toString(8);
+}
+
+// 8'lik (Octal) -> 10'luk
+function octToDecimal() {
+    let val = document.getElementById('convDisplay').value.trim();
+    // 8'lik sistemde sadece 0-7 arası rakamlar olabilir
+    if (!/^[0-7]+$/.test(val)) {
+        document.getElementById('convResult').innerText = "Hata: Sadece 0-7 arası rakam girin!";
+        return;
+    }
+    let num = parseInt(val, 8);
+    document.getElementById('convResult').innerText = "10'luk (Decimal) sonucu: " + num;
+}
+    
     </script>
 
 </body>
