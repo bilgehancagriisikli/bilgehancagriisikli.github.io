@@ -144,11 +144,15 @@
             document.getElementById('convResult').innerText = "";
         }
         function toBinary() {
-            let val = document.getElementById('convDisplay').value;
+              let val = document.getElementById('convDisplay').value.trim();
+         // Sadece rakamlardan oluşup oluşmadığını kontrol eder
+              if (!/^\d+$/.test(val)) {
+            document.getElementById('convResult').innerText = "Hata: Lütfen sadece rakam (0-9) girin!";
+               return;
+    }
             let num = parseInt(val, 10);
-            if(isNaN(num)) document.getElementById('convResult').innerText = "Geçersiz Sayı!";
-            else document.getElementById('convResult').innerText = "2'lik(Binary) sisteme göre: " + num.toString(2);
-        }
+            document.getElementById('convResult').innerText = "2'lik (Binary) sonucu: " + num.toString(2);
+}
         function toDecimal() {
             let val = document.getElementById('convDisplay').value;
             if (!/^[01]+$/.test(val)) {
