@@ -105,6 +105,8 @@
         <div class="buttons" style="grid-template-columns: 1fr;">
             <button class="convert" onclick="toBinary()">10'luk -> 2'lik (Binary)</button>
             <button class="convert" onclick="toDecimal()">2'lik (Binary) -> 10'luk</button>
+            <button class="convert" onclick="hexToBinary()">16'lık (Hex) -> 2'lik (Binary)</button>
+            <button class="convert" onclick="binToHex()">2'lik (Binary) -> 16'lık (Hex)</button>
             <button class="clear" onclick="convTemizle()">Temizle</button>
         </div>
         <p id="convResult" style="margin-top:15px; font-weight:bold; color:#fbc531; min-height: 20px;"></p>
@@ -155,6 +157,29 @@
             }
             document.getElementById('convResult').innerText = "10'luk (Decimal) sisteme göre: " + parseInt(val, 2);
         }
+
+        function hexToBinary() {
+    let val = document.getElementById('convDisplay').value.trim();
+    // 16'lık sistem kontrolü (0-9 ve A-F)
+    if (!/^[0-9A-Fa-f]+$/.test(val)) {
+        document.getElementById('convResult').innerText = "Geçersiz Hexadecimal!";
+        return;
+    }
+    let decimal = parseInt(val, 16);
+    document.getElementById('convResult').innerText = "2'lik(Binary) sonucu: " + decimal.toString(2);
+}
+
+function binToHex() {
+    let val = document.getElementById('convDisplay').value.trim();
+    // Sadece 0 ve 1 kontrolü
+    if (!/^[01]+$/.test(val)) {
+        document.getElementById('convResult').innerText = "Sadece 0 ve 1 girin!";
+        return;
+    }
+    let decimal = parseInt(val, 2);
+    // toUpperCase() ile harflerin büyük (A, B, C...) görünmesini sağlıyoruz
+    document.getElementById('convResult').innerText = "16'lık(Hex) sonucu: " + decimal.toString(16).toUpperCase();
+}
     </script>
 
 </body>
