@@ -123,6 +123,41 @@
         </div>
     </div>
 
+
+<div class="calculator-container" style="background-color: #6c5ce7;">
+    <h3>16'lık Sistem (Hex) Hesap Makinesi</h3>
+    <input type="text" id="hexDisplay" disabled value="0">
+    <div class="buttons">
+        <button class="num" style="background: #a29bfe;" onclick="hexEkle('A(10)')">A</button>
+        <button class="num" style="background: #a29bfe;" onclick="hexEkle('B(11)')">B</button>
+        <button class="num" style="background: #a29bfe;" onclick="hexEkle('C(12)')">C</button>
+        <button class="op" onclick="hexEkle('/')">/</button>
+
+        <button class="num" style="background: #a29bfe;" onclick="hexEkle('D(13)')">D</button>
+        <button class="num" style="background: #a29bfe;" onclick="hexEkle('E(14)')">E</button>
+        <button class="num" style="background: #a29bfe;" onclick="hexEkle('F(15)')">F</button>
+        <button class="op" onclick="hexEkle('*')">x</button>
+
+        <button class="num" onclick="hexEkle('7')">7</button>
+        <button class="num" onclick="hexEkle('8')">8</button>
+        <button class="num" onclick="hexEkle('9')">9</button>
+        <button class="op" onclick="hexEkle('-')">-</button>
+
+        <button class="num" onclick="hexEkle('4')">4</button>
+        <button class="num" onclick="hexEkle('5')">5</button>
+        <button class="num" onclick="hexEkle('6')">6</button>
+        <button class="op" onclick="hexEkle('+')">+</button>
+
+        <button class="num" onclick="hexEkle('1')">1</button>
+        <button class="num" onclick="hexEkle('2')">2</button>
+        <button class="num" onclick="hexEkle('3')">3</button>
+        <button class="clear" onclick="hexTemizle()">C</button>
+
+        <button class="num" style="grid-column: span 2;" onclick="hexEkle('0')">0</button>
+        <button class="equal" style="grid-column: span 2;" onclick="hexHesapla()">=</button>
+    </div>
+</div>
+
     
 
     <div class="calculator-container" style="background-color: #273c75;">
@@ -143,6 +178,10 @@
         <p id="convResult" style="margin-top:15px; font-weight:bold; color:#fbc531; min-height: 20px;"></p>
     </div>
 
+
+
+    
+    
     <script>
         // Standart Hesaplama
         function ekle(v) { 
@@ -283,6 +322,29 @@ function octToBin() {
                 document.getElementById('octDisplay').value = "Hata"; 
             }
         }
+
+// Hexadecimal (16'lık) İşlemler
+function hexEkle(v) {
+    let d = document.getElementById('hexDisplay');
+    if(d.value === "0") d.value = v; else d.value += v;
+}
+
+function hexTemizle() { 
+    document.getElementById('hexDisplay').value = "0"; 
+}
+
+function hexHesapla() {
+    try {
+        let exp = document.getElementById('hexDisplay').value;
+        // Regex ile 0-9 ve A-F arasındaki tüm Hex sayıları bulup 10'luk sisteme çeviriyoruz
+        let result = eval(exp.replace(/[0-9A-Fa-f]+/g, (n) => parseInt(n, 16)));
+        // Sonucu tekrar 16'lığa çevirip büyük harf yapıyoruz
+        document.getElementById('hexDisplay').value = Math.floor(result).toString(16).toUpperCase();
+    } catch { 
+        document.getElementById('hexDisplay').value = "Hata"; 
+    }
+}
+
 
         
     </script>
