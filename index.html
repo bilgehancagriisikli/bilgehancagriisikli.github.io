@@ -10,6 +10,9 @@
     <!-- To automatically render math in text elements, include the auto-render extension: -->
     <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.44/dist/contrib/auto-render.min.js" integrity="sha384-bjyGPfbij8/NDKJhSGZNP/khQVgtHUE5exjm4Ydllo42FwIgYsdLO2lXGmRBf5Mz" crossorigin="anonymous"
         onload="renderMathInElement(document.body);"></script>
+  
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/mathjs/11.8.0/math.js"></script>
+  
   </head>
 
 <head>
@@ -190,6 +193,12 @@
         <p id="convResult" style="margin-top:15px; font-weight:bold; color:#fbc531; min-height: 20px;"></p>
     </div>
 
+    <div class="x-bulucu">
+      <h3>Denklem Çözücü</h3>
+      <input type="text" id="denklemInput" placeholder="Örn: 2x + 5 = 15">
+      <button onclick="coz()">x'i Bul</button>
+      <p id="sonuc"></p>
+    </div>
 
 
     
@@ -356,7 +365,34 @@ function hexHesapla() {
         document.getElementById('hexDisplay').value = "Hata"; 
     }
 }
+//X buluvcu hath.js
+     function coz() {
+    const girdi = document.getElementById('denklemInput').value;
+    const sonucAlani = document.getElementById('sonuc');
 
+    try {
+        // Denklemi eşittir işaretinden ikiye ayırıyoruz
+        const parcalar = girdi.split('=');
+        if (parcalar.length !== 2) {
+            sonucAlani.innerText = "Lütfen geçerli bir denklem girin (örn: 2x = 10)";
+            return;
+        }
+
+        // Sol ve sağ tarafı cebirsel olarak sadeleştirip x'i çekiyoruz
+        const solTaraf = parcalar[0].trim();
+        const sagTaraf = parcalar[1].trim();
+
+        // Basit denklemler için math.js "simplify" ve "derivative" mantığıyla x'i bulabilir
+        // Ancak doğrudan kök bulmak için 'nerdamer' kütüphanesi daha spesifiktir.
+        // Math.js ile basit bir yaklaşım:
+        const denklem = `${solTaraf} - (${sagTaraf})`;
+        const xDegeri = math.evaluate(`solve(${denklem}, x)`); // Bazı sürümlerde eklenti gerektirir
+
+        sonucAlani.innerHTML = `<strong>Sonuç: x = ${xDegeri}</strong>`;
+    } catch (hata) {
+        sonucAlani.innerText = "Hata: Denklem çözülemedi.";
+    }
+}
 
         
     </script>
