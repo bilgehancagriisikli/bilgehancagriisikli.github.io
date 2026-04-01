@@ -20,6 +20,24 @@
         button { width: 100%; padding: 10px; cursor: pointer; background: #28a745; color: white; border: none; }
         #sonuc { margin-top: 15px; font-weight: bold; color: #0056b3; }
     </style>
+
+<meta charset="UTF-8">
+
+    
+    <!-- Sadece Nerdamer Çekirdek ve Çözücü Dosyaları -->
+    <script src="https://cdn.jsdelivr.net/npm/nerdamer@1.1.13/nerdamer.core.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/nerdamer@1.1.13/Algebra.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/nerdamer@1.1.13/Solve.js"></script>
+
+    <style>
+        body { font-family: 'Segoe UI', sans-serif; display: flex; justify-content: center; padding: 50px; background-color: #f0f2f5; }
+        .container { background: white; padding: 25px; border-radius: 12px; box-shadow: 0 8px 20px rgba(0,0,0,0.1); width: 350px; }
+        input { width: 100%; padding: 12px; margin: 15px 0; border: 1px solid #ccc; border-radius: 6px; box-sizing: border-box; font-size: 16px; }
+        button { width: 100%; padding: 12px; background: #2563eb; color: white; border: none; border-radius: 6px; cursor: pointer; font-size: 16px; font-weight: 600; }
+        button:hover { background: #1d4ed8; }
+        #sonucAlani { margin-top: 20px; text-align: center; font-size: 18px; color: #1e293b; }
+    </style>
+  
 </head>
 <body>
 
@@ -477,6 +495,13 @@ function hexHesapla() {
         }
     }
 
+
+     <div class="container">
+    <h3>X'i Bul</h3>
+    <input type="text" id="denklem" placeholder="Örn: 2x = 10">
+    <button onclick="coz()">Hesapla</button>
+    <div id="sonucAlani"></div>
+     </div>
 
     </script>
 
