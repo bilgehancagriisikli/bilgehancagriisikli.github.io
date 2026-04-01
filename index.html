@@ -23,56 +23,6 @@
 </head>
 <body>
 
-
-
-<script>
-    function hesaplaX() {
-        const girdi = document.getElementById('denklemInput').value;
-        const sonucDiv = document.getElementById('sonuc');
-
-        try {
-            // 1. Denklemi "=" işaretinden ayır ve f(x) = 0 formuna sok
-            const parcalar = girdi.split('=');
-            if (parcalar.length !== 2) {
-                sonucDiv.innerText = "Lütfen '=' içeren bir denklem girin.";
-                return;
-            }
-
-            // Sol - (Sağ) mantığı: 2x = 10 -> 2x - (10)
-            const ifade = `(${parcalar[0]}) - (${parcalar[1]})`;
-            
-            // 2. Fonksiyonu derle
-            const f = math.parse(ifade).compile();
-            
-            // 3. Newton-Raphson Yöntemi ile Kök Bulma
-            // Başlangıç tahmini: 0
-            let xDegeri = 0; 
-            for (let i = 0; i < 20; i++) {
-                const y = f.evaluate({x: xDegeri});
-                // Türev alıyoruz (Hız için Math.js'in derivative fonksiyonu)
-                const turev = math.derivative(ifade, 'x').evaluate({x: xDegeri});
-                
-                if (turev === 0) break;
-                
-                // Newton formülü: x_yeni = x - f(x)/f'(x)
-                xDegeri = xDegeri - y / turev;
-            }
-
-            // Sonucu yuvarla (Örn: 4.9999999 -> 5)
-            const nihaiSonuc = math.format(xDegeri, {precision: 10});
-            sonucDiv.innerHTML = "Sonuç: x = " + nihaiSonuc;
-
-        } catch (err) {
-            sonucDiv.innerText = "Hata: Denklem anlaşılamadı. (Örn: 2*x = 10 yazmayı deneyin)";
-        }
-    }
-</script>
-
-</body>
-</html>
-  
-  </head>
-
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
