@@ -10,18 +10,7 @@
     <!-- To automatically render math in text elements, include the auto-render extension: -->
     <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.44/dist/contrib/auto-render.min.js" integrity="sha384-bjyGPfbij8/NDKJhSGZNP/khQVgtHUE5exjm4Ydllo42FwIgYsdLO2lXGmRBf5Mz" crossorigin="anonymous"
         onload="renderMathInElement(document.body);"></script>
-  
-    <!-- Math.js Kütüphanesi -->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/mathjs/11.8.0/math.js"></script>
-    <style>
-        body { font-family: sans-serif; padding: 20px; line-height: 1.6; }
-        .container { max-width: 400px; margin: auto; border: 1px solid #ddd; padding: 20px; border-radius: 8px; }
-        input { width: 100%; padding: 10px; box-sizing: border-box; margin-bottom: 10px; }
-        button { width: 100%; padding: 10px; cursor: pointer; background: #28a745; color: white; border: none; }
-        #sonuc { margin-top: 15px; font-weight: bold; color: #0056b3; }
-    </style>
-</head>
-<body>
+  </head>
 
 <head>
     <meta charset="UTF-8">
@@ -29,7 +18,7 @@
     <title>Benim ilk websitem</title>
     <style>
         body { font-family: 'Segoe UI', sans-serif; text-align: center; background-color: #f4f7f6; padding: 20px; }
-
+        
         .calculator-container {
             background-color: #2c3e50;
             padding: 20px;
@@ -54,7 +43,7 @@
             box-sizing: border-box;
             background: #ecf0f1;
         }
-
+        
         .buttons { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; }
 
         button { padding: 12px; font-size: 16px; border: none; border-radius: 8px; cursor: pointer; font-weight: bold; transition: 0.2s; }
@@ -73,7 +62,6 @@
 <body>
 
     <h1>Merhaba Dünya!</h1>
-    <p>Ben Bilgehan Çağrı Işıklı. Websiteme Hoşgeldiniz.</p>
     <p>Ben Bilgehan Çağrı Işıklı. Websiteme Hoşgeldiniz.$$\KaTeX\int_{\int_{\int_{\int_{}^{}}^{\int_{}^{}}}^{\int_{\int_{}^{}}^{\int_{}^{}}}}^{\int_{\int_{\int_{}^{}}^{\int_{}^{}}}^{\int_{\int_{}^{}}^{\int_{}^{}}}}$$</p>
 
     <div class="image-gallery">
@@ -131,17 +119,17 @@
             <button class="num" onclick="octEkle('6')">6</button>
             <button class="num" onclick="octEkle('5')">5</button>
             <button class="op" onclick="octEkle('/')">/</button>
-
+            
             <button class="num" onclick="octEkle('4')">4</button>
             <button class="num" onclick="octEkle('3')">3</button>
             <button class="num" onclick="octEkle('2')">2</button>
             <button class="op" onclick="octEkle('*')">x</button>
-
+            
             <button class="num" onclick="octEkle('1')">1</button>
             <button class="num" onclick="octEkle('0')">0</button>
             <button class="clear" onclick="octTemizle()">C</button>
             <button class="op" onclick="octEkle('-')">-</button>
-
+            
             <button class="equal" style="grid-column: span 3;" onclick="octHesapla()">=</button>
             <button class="op" onclick="octEkle('+')">+</button>
         </div>
@@ -182,7 +170,7 @@
     </div>
 </div>
 
-
+    
 
     <div class="calculator-container" style="background-color: #273c75;">
         <h3>Taban Dönüştürücü&#128260;</h3>
@@ -196,23 +184,16 @@
             <button class="convert" onclick="octToDecimal()">8'lik (Octal) &#10142; 10'luk (Decimal)</button>
             <button class="convert" onclick="binToOct()">2'lik (Binary) &#10142; (Octal)</button>
             <button class="convert" onclick="octToBin()">8'lik (Octal) &#10142; (Binary)</button>
-
+            
             <button class="clear" onclick="convTemizle()">Temizle&#128465;</button>
         </div>
         <p id="convResult" style="margin-top:15px; font-weight:bold; color:#fbc531; min-height: 20px;"></p>
     </div>
 
 
- <div class="container">
-    <h4>Math.js x Bulucu</h4>
-    <input type="text" id="denklemInput" placeholder="Örn: 2x = 10">
-    <button onclick="hesaplaX()">x'i Hesapla</button>
-    <div id="sonuc"></div>
-</div>
 
-
-
-
+    
+    
     <script>
         // Standart Hesaplama
         function ekle(v) { 
@@ -377,57 +358,7 @@ function hexHesapla() {
 }
 
 
-
-<div class="container">
-    <h4>Math.js x Bulucu</h4>
-    <input type="text" id="denklemInput" placeholder="Örn: 2x = 10">
-    <button onclick="hesaplaX()">x'i Hesapla</button>
-    <div id="sonuc"></div>
-</div>
-
-<script>
-    function hesaplaX() {
-        const girdi = document.getElementById('denklemInput').value;
-        const sonucDiv = document.getElementById('sonuc');
-
-        try {
-            // 1. Denklemi "=" işaretinden ayır ve f(x) = 0 formuna sok
-            const parcalar = girdi.split('=');
-            if (parcalar.length !== 2) {
-                sonucDiv.innerText = "Lütfen '=' içeren bir denklem girin.";
-                return;
-            }
-
-            // Sol - (Sağ) mantığı: 2x = 10 -> 2x - (10)
-            const ifade = `(${parcalar[0]}) - (${parcalar[1]})`;
-            
-            // 2. Fonksiyonu derle
-            const f = math.parse(ifade).compile();
-            
-            // 3. Newton-Raphson Yöntemi ile Kök Bulma
-            // Başlangıç tahmini: 0
-            let xDegeri = 0; 
-            for (let i = 0; i < 20; i++) {
-                const y = f.evaluate({x: xDegeri});
-                // Türev alıyoruz (Hız için Math.js'in derivative fonksiyonu)
-                const turev = math.derivative(ifade, 'x').evaluate({x: xDegeri});
-                
-                if (turev === 0) break;
-                
-                // Newton formülü: x_yeni = x - f(x)/f'(x)
-                xDegeri = xDegeri - y / turev;
-            }
-
-            // Sonucu yuvarla (Örn: 4.9999999 -> 5)
-            const nihaiSonuc = math.format(xDegeri, {precision: 10});
-            sonucDiv.innerHTML = "Sonuç: x = " + nihaiSonuc;
-
-        } catch (err) {
-            sonucDiv.innerText = "Hata: Denklem anlaşılamadı. (Örn: 2*x = 10 yazmayı deneyin)";
-        }
-    }
-
-
+        
     </script>
 
 </body>
