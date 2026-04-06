@@ -421,6 +421,27 @@ function denklemCoz() {
 }
      
 
+
+async function kuantumZarAt() {
+    const status = document.getElementById('status');
+    const resultDiv = document.getElementById('result');
+
+    status.innerText = "Kuantum bilgisayara bağlanılıyor...";
+
+    try {
+        // BURASI ÇOK ÖNEMLİ: Kendi Render linkini buraya yapıştır
+        const response = await fetch('https://proje-adin.onrender.com/run-quantum');
+        const data = await response.json();
+
+        if (data.number !== undefined) {
+            resultDiv.innerText = data.number;
+            status.innerText = "Veri alındı! Cihaz: " + data.device;
+        }
+    } catch (error) {
+        status.innerText = "Bir hata oluştu. Sunucu uyanıyor olabilir, lütfen tekrar deneyin.";
+        console.error("Hata:", error);
+    }
+}
      
         
     </script>
