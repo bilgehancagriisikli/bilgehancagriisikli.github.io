@@ -10,6 +10,8 @@
     <!-- To automatically render math in text elements, include the auto-render extension: -->
     <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.44/dist/contrib/auto-render.min.js" integrity="sha384-bjyGPfbij8/NDKJhSGZNP/khQVgtHUE5exjm4Ydllo42FwIgYsdLO2lXGmRBf5Mz" crossorigin="anonymous"
         onload="renderMathInElement(document.body);"></script>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/mathjs/11.8.0/math.js"></script>
   </head>
 
 <head>
@@ -189,7 +191,15 @@
         </div>
         <p id="convResult" style="margin-top:15px; font-weight:bold; color:#fbc531; min-height: 20px;"></p>
     </div>
-
+  <div class="calculator-container" style="background-color: #27ae60;">
+    <h3>Gelişmiş Denklem Çözücü (Math.js)</h3>
+    <input type="text" id="mathInput" placeholder="Örn: 2x + 5 = 11 veya simplify(2x + x)">
+    <div class="buttons" style="grid-template-columns: 1fr;">
+        <button class="convert" style="background-color: #2ecc71;" onclick="solveEquation()">Denklemi Çöz / Sadeleştir</button>
+        <button class="clear" onclick="mathTemizle()">Temizle</button>
+    </div>
+    <p id="mathResult" style="margin-top:15px; font-weight:bold; color:#ffffff; min-height: 20px;"></p>
+</div>
 
 
     
@@ -357,6 +367,44 @@ function hexHesapla() {
     }
 }
 
+function mathTemizle() {
+    document.getElementById('mathInput').value = "";
+    document.getElementById('mathResult').innerText = "";
+}
+
+function solveEquation() {
+    let input = document.getElementById('mathInput').value.trim();
+    let resultElement = document.getElementById('mathResult');
+
+    try {
+        // Eğer giriş bir denklem ise (içinde '=' varsa)
+        if (input.includes("=")) {
+            let parts = input.split("=");
+            // Sol taraftan sağ tarafı çıkararak 0'a eşitliyoruz: f(x) = 0
+            let equation = `(${parts[0]}) - (${parts[1]})`;
+            
+            // Math.js ile sembolik çözüm (x değişkeni için)
+            // Not: Basit denklemler için tasarlanmıştır.
+            let solution = math.solve(equation, 'x'); 
+            resultElement.innerText = "x = " + solution.toString();
+        } else {
+            // Denklem değilse ifadeyi sadeleştir veya hesapla
+            let evaluated = math.evaluate(input);
+            resultElement.innerText = "Sonuç: " + evaluated;
+        }
+    } catch (err) {
+        // Hata durumunda (Örn: x tanımlı değilse) sadeleştirmeyi dene
+        try {
+            let simplified = math.simplify(input);
+            resultElement.innerText = "Sadeleşmiş: " + simplified.toString();
+        } catch (e) {
+            resultElement.innerText = "Hata: Geçersiz ifade veya denklem!";
+        }
+    }
+}
+
+
+     
 
         
     </script>
