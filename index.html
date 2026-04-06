@@ -11,7 +11,7 @@
     <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.44/dist/contrib/auto-render.min.js" integrity="sha384-bjyGPfbij8/NDKJhSGZNP/khQVgtHUE5exjm4Ydllo42FwIgYsdLO2lXGmRBf5Mz" crossorigin="anonymous"
         onload="renderMathInElement(document.body);"></script>
 
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/mathjs/11.8.0/math.js"></script>
+  <script src="https://unpkg.com/mathjs@11.8.0/lib/browser/math.js"></script>
   
   </head>
 
@@ -374,36 +374,54 @@ function eqTemizle() {
     document.getElementById('eqResult').innerText = "";
 }
 
+
 function denklemCoz() {
     let input = document.getElementById('eqInput').value.trim();
     let resDiv = document.getElementById('eqResult');
 
     if (!input.includes("=")) {
-        resDiv.innerText = "Lütfen '=' içeren bir denklem girin!";
+        resDiv.innerText = "Lütfen '=' içeren bir denklem girin! (Örn: 2x = 10)";
         return;
     }
 
     try {
-        // Denklemi "eşittir" işaretinden ikiye bölüyoruz
-        let sides = input.split("=");
-        
-        // Math.js için denklemi "Sol Taraf - Sağ Taraf = 0" haline getiriyoruz
-        let equation = `(${sides[0]}) - (${sides[1]})`;
-        
-        // Denklemi x değişkenine göre çözüyoruz
-        const node = math.parse(equation);
-        const simplified = math.simplify(equation);
-        
-        // math.solve yerine daha stabil olan sadeleştirme ve kök bulma mantığı:
-        // Basit doğrusal denklemler için en temiz çözüm:
-        let solution = math.solve(equation, 'x');
+        // Denklemi "Sol - Sağ = 0" formatına getiriyoruz
+        let parts = input.split("=");
+        let equation = `(${parts[0]}) - (${parts[1]})`;
 
-        resDiv.innerText = "Sonuç: x = " + solution.toString();
+        // Math.js ile x'e göre sembolik çözüm
+        // Simplify ve derivative mantığıyla basit denklemleri çözeriz
+        // En garantisi: simplify ile x'i yalnız bırakma denemesi
+        
+        const simplified = math.simplify(equation).toString();
+        
+        // Basit doğrusal denklemler için (ax + b = 0) çözümü:
+        // x=0 verip sabiti buluyoruz, x=1 verip eğimi buluyoruz.
+        const f = math.parse(equation).compile();
+        
+        let x0 = f.evaluate({x: 0});
+        let x1 = f.evaluate({x: 1});
+        
+        // Denklem doğrusal ise: f(x) = mx + n => n = x0, m = x1 - x0
+        // mx + n = 0 => x = -n / m
+        let m = x1 - x0;
+        let n = x0;
+
+        if (m !== 0) {
+            let sonuc = -n / m;
+            resDiv.innerText = "Sonuç: x = " + sonuc;
+        } else {
+            resDiv.innerText = "Denklem çözülemedi veya x yok.";
+        }
+
     } catch (err) {
-        resDiv.innerText = "Hata: Denklem çözülemedi. (Sadece x kullanın)";
+        resDiv.innerText = "Hata: Geçersiz ifade! Sadece 'x' kullanın.";
         console.error(err);
     }
 }
+     
+
+     
         
     </script>
 
