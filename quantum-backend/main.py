@@ -18,7 +18,7 @@ app.add_middleware(
 IBM_TOKEN = os.getenv("IBM_QUANTUM_TOKEN")
 
 # Servisi bu gizli anahtar ile başlatıyoruz
-service = QiskitRuntimeService(channel="ibm_quantum_platform", token=IBM_TOKEN)
+service = QiskitRuntimeService(channel="ibm_quantum", token=IBM_TOKEN)
 
 @app.get("/run-quantum")
 async def run_quantum():
