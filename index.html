@@ -10,6 +10,9 @@
     <!-- To automatically render math in text elements, include the auto-render extension: -->
     <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.44/dist/contrib/auto-render.min.js" integrity="sha384-bjyGPfbij8/NDKJhSGZNP/khQVgtHUE5exjm4Ydllo42FwIgYsdLO2lXGmRBf5Mz" crossorigin="anonymous"
         onload="renderMathInElement(document.body);"></script>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/mathjs/11.8.0/math.js"></script>
+  
   </head>
 
 <head>
@@ -191,7 +194,16 @@
     </div>
 
 
-
+<div class="calculator-container" style="background-color: #16a085;">
+    <h3>Denklem Çözücü (x'i Bul)</h3>
+    <p style="font-size: 12px; color: #bdc3c7;">Örnek: 2x + 10 = 20</p>
+    <input type="text" id="eqInput" placeholder="Denklemi yazın...">
+    <div class="buttons" style="grid-template-columns: 1fr;">
+        <button class="equal" style="background-color: #1abc9c;" onclick="denklemCoz()">x Değerini Hesapla</button>
+        <button class="clear" onclick="eqTemizle()">Temizle</button>
+    </div>
+    <div id="eqResult" style="margin-top:15px; font-size: 18px; font-weight:bold; color:#f1c40f;"></div>
+</div>
     
     
     <script>
@@ -357,7 +369,41 @@ function hexHesapla() {
     }
 }
 
+function eqTemizle() {
+    document.getElementById('eqInput').value = "";
+    document.getElementById('eqResult').innerText = "";
+}
 
+function denklemCoz() {
+    let input = document.getElementById('eqInput').value.trim();
+    let resDiv = document.getElementById('eqResult');
+
+    if (!input.includes("=")) {
+        resDiv.innerText = "Lütfen '=' içeren bir denklem girin!";
+        return;
+    }
+
+    try {
+        // Denklemi "eşittir" işaretinden ikiye bölüyoruz
+        let sides = input.split("=");
+        
+        // Math.js için denklemi "Sol Taraf - Sağ Taraf = 0" haline getiriyoruz
+        let equation = `(${sides[0]}) - (${sides[1]})`;
+        
+        // Denklemi x değişkenine göre çözüyoruz
+        const node = math.parse(equation);
+        const simplified = math.simplify(equation);
+        
+        // math.solve yerine daha stabil olan sadeleştirme ve kök bulma mantığı:
+        // Basit doğrusal denklemler için en temiz çözüm:
+        let solution = math.solve(equation, 'x');
+
+        resDiv.innerText = "Sonuç: x = " + solution.toString();
+    } catch (err) {
+        resDiv.innerText = "Hata: Denklem çözülemedi. (Sadece x kullanın)";
+        console.error(err);
+    }
+}
         
     </script>
 
