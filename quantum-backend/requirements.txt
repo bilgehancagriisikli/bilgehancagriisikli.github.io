@@ -1,4 +1,4 @@
 fastapi
 uvicorn
-qiskit-ibm-runtime
-qiskit
+qiskit-ibm-runtime==0.23.0
+qiskit==1.0.2
