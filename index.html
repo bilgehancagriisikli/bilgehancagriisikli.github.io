@@ -276,25 +276,7 @@
     </div>
 </div>
 
-
-
- <div id="logic-playground" class="calculator-container" style="width: 80%; max-width: 800px; background: #2f3640;">
-    <h3>Sürükle-Bırak Mantık Laboratuvarı</h3>
-    
-    <div style="display: flex; gap: 20px; height: 400px;">
-        <div id="toolbox" style="width: 100px; background: #353b48; padding: 10px; border-radius: 10px; display: flex; flex-direction: column; gap: 10px;">
-            <div class="gate-tool" draggable="true" data-type="AND" style="background: #f1c40f; padding: 10px; cursor: move; border-radius: 5px; color: black; font-weight: bold;">AND</div>
-            <div class="gate-tool" draggable="true" data-type="OR" style="background: #e67e22; padding: 10px; cursor: move; border-radius: 5px; color: white; font-weight: bold;">OR</div>
-            <div class="gate-tool" draggable="true" data-type="NOT" style="background: #e74c3c; padding: 10px; cursor: move; border-radius: 5px; color: white; font-weight: bold;">NOT</div>
-        </div>
-
-        <div id="workspace" style="flex-grow: 1; background: #ecf0f1; border-radius: 10px; position: relative; overflow: hidden; border: 2px dashed #7f8c8d;">
-            <p style="color: #7f8c8d; margin-top: 180px;">Kapıları buraya sürükleyin</p>
-        </div>
-    </div>
-    
-    <button class="clear" onclick="resetWorkspace()" style="margin-top: 15px; width: 100%;">Alanı Temizle</button>
-</div>
+ 
 
 
     <script>
@@ -658,61 +640,7 @@ function resetQubit() {
     document.getElementById('qInfo').innerText = "Qubit başlangıç durumuna döndü.";
 }
 
-
-const workspace = document.getElementById('workspace');
-const tools = document.querySelectorAll('.gate-tool');
-
-// Sürükleme başladığında veri set et
-tools.forEach(tool => {
-    tool.addEventListener('dragstart', (e) => {
-        e.dataTransfer.setData('gateType', e.target.getAttribute('data-type'));
-    });
-});
-
-// Workspace üzerine gelindiğinde varsayılanı engelle (drop'a izin ver)
-workspace.addEventListener('dragover', (e) => {
-    e.preventDefault();
-});
-
-// Bırakma anı
-workspace.addEventListener('drop', (e) => {
-    e.preventDefault();
-    const gateType = e.dataTransfer.getData('gateType');
-    
-    // Workspace'in koordinatlarını hesapla
-    const rect = workspace.getBoundingClientRect();
-    const x = e.clientX - rect.left;
-    const y = e.clientY - rect.top;
-
-    createGateOnWorkspace(gateType, x, y);
-});
-
-function createGateOnWorkspace(type, x, y) {
-    const newGate = document.createElement('div');
-    newGate.innerText = type;
-    newGate.style.position = 'absolute';
-    newGate.style.left = (x - 25) + 'px';
-    newGate.style.top = (y - 20) + 'px';
-    newGate.style.padding = '10px';
-    newGate.style.background = '#2c3e50';
-    newGate.style.color = 'white';
-    newGate.style.borderRadius = '5px';
-    newGate.style.cursor = 'pointer';
-    newGate.style.boxShadow = '0 4px 8px rgba(0,0,0,0.2)';
-    
-    // Üzerine tıklandığında silinsin
-    newGate.onclick = function() { this.remove(); };
-
-    workspace.appendChild(newGate);
-}
-
-function resetWorkspace() {
-    workspace.innerHTML = '<p style="color: #7f8c8d; margin-top: 180px;">Kapıları buraya sürükleyin</p>';
-}
-
-
-
-     
+        
     </script>
 
 </body>
