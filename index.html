@@ -226,7 +226,29 @@
     </div>
 </div>
 <!-- Kuantum Zar Bölümü Bitişi -->
-    
+
+<div id="logic-calc" class="calculator-container" style="background-color: #2f3640; width: 350px;">
+    <h3>Mantık Kapıları Simülatörü</h3>
+    <div style="display: flex; justify-content: space-around; align-items: center; margin-bottom: 20px;">
+        <div style="display: flex; flex-direction: column; gap: 10px;">
+            <button id="inputA" class="bin" onclick="toggleInput('inputA')">A: 0</button>
+            <button id="inputB" class="bin" onclick="toggleInput('inputB')">B: 0</button>
+        </div>
+
+        <select id="gateSelect" onchange="updateLogic()" style="padding: 10px; border-radius: 5px; background: #ecf0f1;">
+            <option value="AND">VE (AND)</option>
+            <option value="OR">VEYA (OR)</option>
+            <option value="XOR">ÖZEL VEYA (XOR)</option>
+            <option value="NAND">VE DEĞİL (NAND)</option>
+            <option value="NOR">VEYA DEĞİL (NOR)</option>
+        </select>
+
+        <div id="logicOutput" style="width: 50px; height: 50px; line-height: 50px; border-radius: 50%; background: #7f8c8d; font-weight: bold; font-size: 20px;">0</div>
+    </div>
+    <p id="logicFormula" style="font-family: 'Courier New', monospace; color: #f1c40f;">A . B = 0</p>
+</div>
+
+
     <script>
         // Standart Hesaplama
         function ekle(v) { 
@@ -475,6 +497,62 @@ async function kuantumZarAt() {
 }
 
      
+//Mantık devreleri
+
+let stateA = 0;
+let stateB = 0;
+
+function toggleInput(id) {
+    if (id === 'inputA') {
+        stateA = stateA === 0 ? 1 : 0;
+        document.getElementById(id).innerText = "A: " + stateA;
+    } else {
+        stateB = stateB === 0 ? 1 : 0;
+        document.getElementById(id).innerText = "B: " + stateB;
+    }
+    updateLogic();
+}
+
+function updateLogic() {
+    const gate = document.getElementById('gateSelect').value;
+    const outputDiv = document.getElementById('logicOutput');
+    const formulaDiv = document.getElementById('logicFormula');
+    let result = 0;
+    let symbol = "";
+
+    switch (gate) {
+        case "AND":
+            result = stateA & stateB;
+            symbol = "A . B";
+            break;
+        case "OR":
+            result = stateA | stateB;
+            symbol = "A + B";
+            break;
+        case "XOR":
+            result = stateA ^ stateB;
+            symbol = "A ⊕ B";
+            break;
+        case "NAND":
+            result = !(stateA & stateB) ? 1 : 0;
+            symbol = "!(A . B)";
+            break;
+        case "NOR":
+            result = !(stateA | stateB) ? 1 : 0;
+            symbol = "!(A + B)";
+            break;
+    }
+
+    outputDiv.innerText = result;
+    formulaDiv.innerText = `${symbol} = ${result}`;
+    
+    // Çıkış yanıyorsa rengi değiştir (Lamba efekti)
+    outputDiv.style.background = result === 1 ? "#f1c40f" : "#7f8c8d";
+    outputDiv.style.boxShadow = result === 1 ? "0 0 15px #f1c40f" : "none";
+}
+
+
+
         
     </script>
 
