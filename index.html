@@ -249,6 +249,36 @@
 </div>
 
 
+
+<div id="q-logic-calc" class="calculator-container" style="background-color: #4b0082; width: 350px;">
+    <h3>Kuantum Kapı Simülatörü</h3>
+    <p style="font-size: 11px; color: #dcdde1;">Qubit durumunu değiştirmek için bir kapı seçin.</p>
+    
+    <div style="margin: 20px 0;">
+        <div id="qSphere" style="width: 60px; height: 60px; line-height: 60px; border-radius: 50%; background: #f1c40f; margin: 0 auto 15px; font-weight: bold; transition: 0.5s; border: 3px solid white;">
+            |0⟩
+        </div>
+        
+        <div style="font-size: 14px; color: #fbc531; margin-bottom: 10px;">
+            Mevcut Durum: <span id="qStateText">|0⟩ (Aşağı)</span>
+        </div>
+    </div>
+
+    <div class="buttons" style="grid-template-columns: 1fr 1fr;">
+        <button class="bin" onclick="applyQGate('X')" title="NOT Kapısı">X (Pauli-X)</button>
+        <button class="bin" onclick="applyQGate('H')" title="Süperpozisyon">H (Hadamard)</button>
+        <button class="bin" onclick="applyQGate('Z')" title="Faz Değişimi">Z (Pauli-Z)</button>
+        <button class="clear" onclick="resetQubit()">Sıfırla</button>
+    </div>
+
+    <div id="qInfo" style="margin-top: 15px; font-size: 12px; color: #bdc3c7; line-height: 1.4;">
+        Kapı açıklaması burada görünecek.
+    </div>
+</div>
+
+ 
+
+
     <script>
         // Standart Hesaplama
         function ekle(v) { 
@@ -552,6 +582,63 @@ function updateLogic() {
 }
 
 
+
+let qubitState = 0; // 0: |0>, 1: |1>, 0.5: |+> (Süperpozisyon)
+
+function applyQGate(gate) {
+    const sphere = document.getElementById('qSphere');
+    const stateText = document.getElementById('qStateText');
+    const info = document.getElementById('qInfo');
+
+    if (gate === 'X') {
+        // X Kapısı: |0> -> |1> veya |1> -> |0>
+        if (qubitState === 0) qubitState = 1;
+        else if (qubitState === 1) qubitState = 0;
+        info.innerText = "X Kapısı (Bit-flip): Qubiti tersine çevirdi.";
+    } 
+    else if (gate === 'H') {
+        // H Kapısı: Qubiti süperpozisyona sokar
+        qubitState = 0.5;
+        info.innerText = "Hadamard Kapısı: Qubit artık hem 0 hem 1 durumunda (Süperpozisyon)!";
+    }
+    else if (gate === 'Z') {
+        // Z Kapısı: Fazı değiştirir (Görselde renk değişimiyle temsil edelim)
+        sphere.style.borderColor = "#e84118";
+        info.innerText = "Z Kapısı: Qubitin fazını 180 derece çevirdi.";
+        return; 
+    }
+
+    updateQubitUI();
+}
+
+function updateQubitUI() {
+    const sphere = document.getElementById('qSphere');
+    const stateText = document.getElementById('qStateText');
+
+    if (qubitState === 0) {
+        sphere.innerText = "|0⟩";
+        sphere.style.background = "#f1c40f"; // Sarı
+        stateText.innerText = "|0⟩ (Aşağı Spin)";
+        sphere.style.transform = "rotate(0deg)";
+    } else if (qubitState === 1) {
+        sphere.innerText = "|1⟩";
+        sphere.style.background = "#9c88ff"; // Mor
+        stateText.innerText = "|1⟩ (Yukarı Spin)";
+        sphere.style.transform = "rotate(180deg)";
+    } else if (qubitState === 0.5) {
+        sphere.innerText = "|+⟩";
+        sphere.style.background = "linear-gradient(45deg, #f1c40f, #9c88ff)";
+        stateText.innerText = "Süperpozisyon (|0⟩ + |1⟩)";
+        sphere.style.transform = "rotate(90deg)";
+    }
+}
+
+function resetQubit() {
+    qubitState = 0;
+    document.getElementById('qSphere').style.borderColor = "white";
+    updateQubitUI();
+    document.getElementById('qInfo').innerText = "Qubit başlangıç durumuna döndü.";
+}
 
         
     </script>
