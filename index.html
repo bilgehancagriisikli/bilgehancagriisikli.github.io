@@ -282,7 +282,12 @@ html {
     </div>
 </div>
 <!-- Kuantum Zar Bölümü Bitişi -->
-    
+
+
+
+
+
+ 
     <script>
 
         .calculator-container {
@@ -536,7 +541,105 @@ async function kuantumZarAt() {
     }
 }
 
+
+
+
+<div id="logic-calc" class="calculator-container" style="background-color: #34495e; width: 350px;">
+    <h3>Mantık Kapıları Simülatörü</h3>
+    
+    <div style="display: flex; justify-content: center; gap: 20px; margin-bottom: 20px;">
+        <div>
+            <label style="display:block; margin-bottom:5px;">Giriş A</label>
+            <input type="checkbox" id="gateA" onchange="updateLogic()" style="width: 25px; height: 25px; cursor: pointer;">
+        </div>
+        <div>
+            <label style="display:block; margin-bottom:5px;">Giriş B</label>
+            <input type="checkbox" id="gateB" onchange="updateLogic()" style="width: 25px; height: 25px; cursor: pointer;">
+        </div>
+    </div>
+
+    <div style="margin-bottom: 20px;">
+        <label>Kapı Türü Seçin:</label>
+        <select id="gateType" onchange="updateLogic()" style="width: 100%; padding: 10px; border-radius: 5px; background: #ecf0f1; font-weight: bold;">
+            <option value="AND">AND (Ve)</option>
+            <option value="OR">OR (Veya)</option>
+            <option value="NOT">NOT (Değil - Sadece A)</option>
+            <option value="NAND">NAND (Ve Değil)</option>
+            <option value="NOR">NOR (Veya Değil)</option>
+            <option value="XOR">XOR (Özel Veya)</option>
+        </select>
+    </div>
+
+    <div style="background: #2c3e50; padding: 20px; border-radius: 10px; border: 2px dashed #7f8c8d;">
+        <div id="logicBulb" style="width: 50px; height: 50px; border-radius: 50%; background: #7f8c8d; margin: 0 auto 10px; transition: 0.3s; border: 3px solid white;"></div>
+        <div id="logicFormula" style="font-family: 'Courier New', monospace; font-size: 18px; color: #f1c40f;">A . B = Q</div>
+        <div id="logicStatus" style="font-size: 14px; margin-top: 5px; color: #bdc3c7;">Çıkış: 0</div>
+    </div>
+</div>     
      
+
+
+
+function updateLogic() {
+    const a = document.getElementById('gateA').checked;
+    const b = document.getElementById('gateB').checked;
+    const type = document.getElementById('gateType').value;
+    const bulb = document.getElementById('logicBulb');
+    const status = document.getElementById('logicStatus');
+    const formula = document.getElementById('logicFormula');
+    
+    let result = false;
+    let symbol = "";
+
+    switch (type) {
+        case 'AND':
+            result = a && b;
+            symbol = "A . B = Q";
+            break;
+        case 'OR':
+            result = a || b;
+            symbol = "A + B = Q";
+            break;
+        case 'NOT':
+            result = !a;
+            symbol = "A' = Q";
+            break;
+        case 'NAND':
+            result = !(a && b);
+            symbol = "(A . B)' = Q";
+            break;
+        case 'NOR':
+            result = !(a || b);
+            symbol = "(A + B)' = Q";
+            break;
+        case 'XOR':
+            result = a !== b;
+            symbol = "A ⊕ B = Q";
+            break;
+    }
+
+    // Görsel Güncelleme
+    if (result) {
+        bulb.style.backgroundColor = "#f1c40f";
+        bulb.style.boxShadow = "0 0 25px #f1c40f";
+        status.innerText = "Çıkış: 1 (AÇIK)";
+    } else {
+        bulb.style.backgroundColor = "#7f8c8d";
+        bulb.style.boxShadow = "none";
+        status.innerText = "Çıkış: 0 (KAPALI)";
+    }
+    formula.innerText = symbol;
+}
+
+// Sayfa yüklendiğinde ilk hesaplamayı yapması için:
+window.onload = function() {
+    // Eğer başka onload fonksiyonların varsa onlarla birleştir
+    updateLogic();
+};
+     
+
+
+
         
     </script>
 
