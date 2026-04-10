@@ -20,6 +20,48 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Benim ilk websitem</title>
     <style>
+
+    /* Navigasyon Çubuğu Stili */
+.navbar {
+    background-color: #2c3e50;
+    position: sticky;
+    top: 0;
+    z-index: 1000;
+    padding: 10px 0;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.2);
+}
+
+.navbar ul {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    justify-content: center;
+    flex-wrap: wrap; /* Mobilde alt alta gelmesi için */
+}
+
+.navbar li {
+    margin: 0 15px;
+}
+
+.navbar a {
+    color: white;
+    text-decoration: none;
+    font-weight: bold;
+    font-size: 14px;
+    transition: 0.3s;
+}
+
+.navbar a:hover {
+    color: #f1c40f;
+}
+
+/* Sayfa kaydırıldığında başlığın menü altında kalmaması için */
+html {
+    scroll-behavior: smooth; /* Yumuşak kaydırma efekti */
+}
+     
+     
         body { font-family: 'Segoe UI', sans-serif; text-align: center; background-color: #f4f7f6; padding: 20px; }
         
         .calculator-container {
@@ -64,6 +106,20 @@
 </head>
 <body>
 
+ 
+ <nav class="navbar">
+    <ul>
+        <li><a href="#std-calc">Standart</a></li>
+        <li><a href="#bin-calc">Binary</a></li>
+        <li><a href="#oct-calc">Octal</a></li>
+        <li><a href="#hex-calc">Hex</a></li>
+        <li><a href="#conv-calc">Dönüştürücü</a></li>
+        <li><a href="#eq-calc">Denklem</a></li>
+        <li><a href="#q-calc">Kuantum</a></li>
+    </ul>
+</nav>
+
+ 
     <h1>Merhaba Dünya!</h1>
     <p>Ben Bilgehan Çağrı Işıklı. Websiteme Hoşgeldiniz.$$\KaTeX\int_{\int_{\int_{\int_{}^{}}^{\int_{}^{}}}^{\int_{\int_{}^{}}^{\int_{}^{}}}}^{\int_{\int_{\int_{}^{}}^{\int_{}^{}}}^{\int_{\int_{}^{}}^{\int_{}^{}}}}$$</p>
 
@@ -76,7 +132,7 @@
 
     <hr style="width: 50%; margin: 40px auto; border: 0.5px solid #ccc;">
 
-    <div class="calculator-container">
+   <div id="std-calc" class="calculator-container">
         <h3>Normal (10'luk) Hesap Makinesi</h3>
         <input type="text" id="display" disabled value="0">
         <div class="buttons">
@@ -99,7 +155,7 @@
         </div>
     </div>
 
-    <div class="calculator-container" style="background-color: #1a252f;">
+   <div id="bin-calc" class="calculator-container" style="background-color: #1a252f;">
         <h3>2'lik Sistem (Binary) Hesap Makinesi</h3>
         <input type="text" id="binDisplay" disabled value="0">
         <div class="buttons">
@@ -114,7 +170,7 @@
         </div>
     </div>
 
-    <div class="calculator-container" style="background-color: #d35400;">
+    <div id="oct-calc" class="calculator-container" style="background-color: #d35400;">
         <h3>8'lik Sistem (Octal) Hesap Makinesi</h3>
         <input type="text" id="octDisplay" disabled value="0">
         <div class="buttons">
@@ -139,7 +195,7 @@
     </div>
 
 
-<div class="calculator-container" style="background-color: #6c5ce7;">
+<div id="hex-calc" class="calculator-container" style="background-color: #6c5ce7;">
     <h3>16'lık Sistem (Hexadecimal) Hesap Makinesi</h3>
     <input type="text" id="hexDisplay" disabled value="0">
     <div class="buttons">
@@ -175,7 +231,7 @@
 
     
 
-    <div class="calculator-container" style="background-color: #273c75;">
+    <div id="conv-calc" class="calculator-container" style="background-color: #273c75;">
         <h3>Taban Dönüştürücü&#128260;</h3>
         <input type="text" id="convDisplay" placeholder="Sayı giriniz...">
         <div class="buttons" style="grid-template-columns: 1fr;">
@@ -194,7 +250,7 @@
     </div>
 
 
-<div class="calculator-container" style="background-color: #16a085;">
+<div id="eq-calc" class="calculator-container" style="background-color: #16a085;">
     <h3>Denklem Çözücü (x'i Bul)</h3>
     <p style="font-size: 12px; color: #bdc3c7;">Örnek: 2x + 10 = 20</p>
     <input type="text" id="eqInput" placeholder="Denklemi yazın...">
@@ -206,7 +262,7 @@
 </div>
 
  <!-- Kuantum Zar Bölümü Başlangıcı -->
-<div class="calculator-container" style="background-color: #8e44ad; width: 320px;">
+<div id="q-calc" class="calculator-container" style="background-color: #8e44ad; width: 320px;">
     <h3>Kuantum Rastgele Sayı Üretici (QRNG)</h3>
     <p style="font-size: 11px; color: #ecf0f1; margin-bottom: 10px;">
         IBM Quantum bilgisayarından gerçek zamanlı veri çekilir.
