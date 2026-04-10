@@ -116,6 +116,7 @@ html {
         <li><a href="#conv-calc">Dönüştürücü</a></li>
         <li><a href="#eq-calc">Denklem</a></li>
         <li><a href="#q-calc">Kuantum</a></li>
+        <li><a href="#logic-calc">Mantık Devresi</a></li>
     </ul>
 </nav>
 
@@ -581,41 +582,31 @@ async function kuantumZarAt() {
 
 
 function updateLogic() {
-    const a = document.getElementById('gateA').checked;
-    const b = document.getElementById('gateB').checked;
-    const type = document.getElementById('gateType').value;
+    // Elemanları al
+    const gateA = document.getElementById('gateA');
+    const gateB = document.getElementById('gateB');
+    const gateType = document.getElementById('gateType');
     const bulb = document.getElementById('logicBulb');
     const status = document.getElementById('logicStatus');
     const formula = document.getElementById('logicFormula');
+
+    // Eğer elemanlardan biri henüz yüklenmemişse fonksiyondan çık
+    if (!gateA || !gateB || !gateType || !bulb) return;
+
+    const a = gateA.checked;
+    const b = gateB.checked;
+    const type = gateType.value;
     
     let result = false;
     let symbol = "";
 
     switch (type) {
-        case 'AND':
-            result = a && b;
-            symbol = "A . B = Q";
-            break;
-        case 'OR':
-            result = a || b;
-            symbol = "A + B = Q";
-            break;
-        case 'NOT':
-            result = !a;
-            symbol = "A' = Q";
-            break;
-        case 'NAND':
-            result = !(a && b);
-            symbol = "(A . B)' = Q";
-            break;
-        case 'NOR':
-            result = !(a || b);
-            symbol = "(A + B)' = Q";
-            break;
-        case 'XOR':
-            result = a !== b;
-            symbol = "A ⊕ B = Q";
-            break;
+        case 'AND': result = a && b; symbol = "A . B = Q"; break;
+        case 'OR':  result = a || b; symbol = "A + B = Q"; break;
+        case 'NOT': result = !a; symbol = "A' = Q"; break;
+        case 'NAND': result = !(a && b); symbol = "(A . B)' = Q"; break;
+        case 'NOR':  result = !(a || b); symbol = "(A + B)' = Q"; break;
+        case 'XOR':  result = a !== b; symbol = "A ⊕ B = Q"; break;
     }
 
     // Görsel Güncelleme
@@ -631,11 +622,34 @@ function updateLogic() {
     formula.innerText = symbol;
 }
 
+    // Görsel Güncelleme
+    if (result) {
+        bulb.style.backgroundColor = "#f1c40f";
+        bulb.style.boxShadow = "0 0 25px #f1c40f";
+        status.innerText = "Çıkış: 1 (AÇIK)";
+    } else {
+        bulb.style.backgroundColor = "#7f8c8d";
+        bulb.style.boxShadow = "none";
+        status.innerText = "Çıkış: 0 (KAPALI)";
+    }
+    formula.innerText = symbol;
+}
 
 
+// Sayfa yüklendiğinde ilk hesaplamayı yapması için:
+window.onload = function() {
+    // Eğer başka onload fonksiyonların varsa onlarla birleştir
+    updateLogic();
+};
 
 
-        
+// Sayfa yüklendiğinde çalışacak fonksiyonları buraya güvenli şekilde ekliyoruz
+document.addEventListener('DOMContentLoaded', function() {
+    updateLogic(); // Klasik mantık kapılarını başlat
+    if (typeof runQuantumGate === "function") runQuantumGate(); // Kuantum kapılarını başlat
+});
+
+     
     </script>
 
 </body>
