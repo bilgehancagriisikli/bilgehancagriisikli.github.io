@@ -1,0 +1,2443 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Web Programlama — Kod Atölyesi</title>
+  <script>
+    /* Temayı, sayfa boyanmadan önce ayarla (yanıp sönmeyi önler) */
+    (function () {
+      try {
+        var t = localStorage.getItem("wp-theme");
+        if (!t) t = matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light";
+        document.documentElement.setAttribute("data-theme", t);
+      } catch (e) {}
+    })();
+  </script>
+  <style>
+/* =====================================================================
+   Web Programlama — Kod Atölyesi · tema
+   Yapısal renk sistemi: her dilin kendi rengi vardır (anlam taşır).
+===================================================================== */
+:root {
+  --bg: #eef1f6;
+  --nav: #0f1b30;
+  --nav-soft: #1b2b47;
+  --card: #ffffff;
+  --code-bg: #0f1f33;
+  --ink: #1f2733;
+  --muted: #64748b;
+  --line: #dde3ec;
+  --primary: #3b5bdb;
+  --primary-dark: #1c3aa9;
+
+  --html: #e34c26;
+  --css: #2965f1;
+  --js: #d99413;
+  --php: #8b5cf6;
+  --kavram: #0d9488;
+
+  --mono: ui-monospace, "DejaVu Sans Mono", "SF Mono", Menlo, Consolas, monospace;
+  --sans: -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+}
+
+* { box-sizing: border-box; }
+html, body { height: 100%; }
+body {
+  margin: 0; background: var(--bg); color: var(--ink);
+  font-family: var(--sans); font-size: 15px; line-height: 1.55;
+  display: flex; flex-direction: column; overflow: hidden;
+}
+
+/* ---------------- top bar ---------------- */
+.topbar {
+  background: var(--nav); color: #fff; flex: 0 0 auto;
+  display: flex; align-items: center; gap: 18px;
+  padding: 12px 20px; border-bottom: 3px solid var(--primary);
+}
+.brand { display: flex; flex-direction: column; line-height: 1.15; margin-right: 6px; }
+.brand .row { display: flex; align-items: baseline; gap: 8px; }
+#app-title { font-size: 18px; font-weight: 800; letter-spacing: -.3px; }
+#app-sub {
+  font-size: 11px; font-weight: 700; letter-spacing: 2px; text-transform: uppercase;
+  color: #8fb4ff; background: rgba(59,91,219,.18); padding: 2px 8px; border-radius: 5px;
+}
+
+.search-wrap { margin-left: auto; position: relative; }
+#search {
+  width: 240px; max-width: 42vw; background: #0a1422; color: #eaf0fb;
+  border: 1px solid #2b3c5c; border-radius: 8px; padding: 8px 12px 8px 30px; font-size: 13px;
+  font-family: var(--sans);
+}
+#search::placeholder { color: #7488a8; }
+#search:focus { outline: 2px solid var(--primary); border-color: transparent; }
+.search-wrap::before {
+  content: "⌕"; position: absolute; left: 9px; top: 50%; transform: translateY(-50%);
+  color: #7488a8; font-size: 15px;
+}
+
+.chips { display: flex; gap: 6px; }
+.chip {
+  font-family: var(--sans); font-size: 12px; font-weight: 600; cursor: pointer;
+  background: transparent; color: #c7d3e8; border: 1px solid #2b3c5c;
+  padding: 6px 11px; border-radius: 20px; transition: all .15s ease;
+}
+.chip:hover { border-color: #4a5f86; color: #fff; }
+.chip.active { background: var(--primary); border-color: var(--primary); color: #fff; }
+.chip.lang-pill-html.active { background: var(--html); border-color: var(--html); }
+.chip.lang-pill-css.active  { background: var(--css);  border-color: var(--css); }
+.chip.lang-pill-js.active   { background: var(--js);   border-color: var(--js); }
+.chip.lang-pill-php.active  { background: var(--php);  border-color: var(--php); }
+
+/* ---------------- layout ---------------- */
+.shell { flex: 1 1 auto; display: flex; min-height: 0; }
+
+.sidebar {
+  flex: 0 0 268px; background: var(--nav); color: #cdd9ec;
+  overflow-y: auto; padding: 14px 10px 30px;
+}
+.side-title {
+  font-size: 11px; letter-spacing: 2px; text-transform: uppercase;
+  color: #7488a8; padding: 6px 10px 10px; font-weight: 700;
+}
+.side-item {
+  width: 100%; text-align: left; display: flex; align-items: center; gap: 10px;
+  background: transparent; border: 0; color: inherit; cursor: pointer;
+  padding: 9px 10px; border-radius: 9px; font-family: var(--sans); margin-bottom: 2px;
+  transition: background .12s ease;
+}
+.side-item:hover { background: var(--nav-soft); }
+.side-item.active { background: var(--primary); color: #fff; }
+.side-num {
+  font-family: var(--mono); font-size: 16px; font-weight: 700; opacity: .55;
+  flex: 0 0 26px; text-align: center;
+}
+.side-item.active .side-num { opacity: 1; }
+.side-text { display: flex; flex-direction: column; gap: 3px; min-width: 0; }
+.side-name { font-size: 13.5px; font-weight: 600; }
+.side-dots { display: flex; gap: 4px; }
+.dot { width: 9px; height: 9px; border-radius: 50%; display: inline-block; }
+.dot.lang-html { background: var(--html); }
+.dot.lang-css  { background: var(--css); }
+.dot.lang-js   { background: var(--js); }
+.dot.lang-php  { background: var(--php); }
+.dot.lang-kavram { background: var(--kavram); }
+
+.main {
+  flex: 1 1 auto; overflow-y: auto; padding: 26px 32px 60px; min-width: 0;
+}
+
+/* ---------------- week head ---------------- */
+.week-head-block { margin-bottom: 18px; max-width: 940px; }
+.week-eyebrow {
+  font-size: 12px; font-weight: 700; letter-spacing: 1.5px; text-transform: uppercase;
+  color: var(--primary); margin-bottom: 4px;
+}
+.week-head-block.added .week-eyebrow { color: var(--html); }
+.week-head-block h2 { margin: 0 0 4px; font-size: 26px; font-weight: 800; letter-spacing: -.5px; }
+.week-sum { margin: 0; color: var(--muted); font-size: 15px; }
+
+.badge-added {
+  display: inline-block; background: #fde68a; color: #7c2d12; font-size: 10px;
+  font-weight: 800; padding: 2px 7px; border-radius: 10px; margin-left: 8px;
+  letter-spacing: .5px; vertical-align: middle;
+}
+.note-banner {
+  max-width: 940px; background: #fff7ed; border: 1px solid #fdba74; border-left: 5px solid var(--html);
+  color: #7c2d12; padding: 10px 14px; border-radius: 8px; margin-bottom: 18px; font-size: 13.5px;
+}
+.result-week {
+  max-width: 940px; font-size: 12px; font-weight: 700; color: var(--muted);
+  text-transform: uppercase; letter-spacing: 1px; margin: 16px 0 6px;
+}
+.empty { color: var(--muted); }
+
+/* ---------------- card ---------------- */
+.card {
+  background: var(--card); border: 1px solid var(--line); border-radius: 14px;
+  padding: 16px 18px; margin-bottom: 16px; max-width: 940px;
+  box-shadow: 0 1px 2px rgba(15,27,48,.04);
+}
+.card-head { display: flex; align-items: center; gap: 10px; }
+.card-name { margin: 0; font-size: 17px; font-weight: 700; flex: 1 1 auto; }
+.lang-badge {
+  font-size: 11px; font-weight: 800; letter-spacing: .4px; color: #fff;
+  padding: 3px 9px; border-radius: 6px; flex: 0 0 auto;
+}
+.lang-badge.lang-html { background: var(--html); }
+.lang-badge.lang-css  { background: var(--css); }
+.lang-badge.lang-js   { background: var(--js); }
+.lang-badge.lang-php  { background: var(--php); }
+.lang-badge.lang-kavram { background: var(--kavram); }
+.card-note { margin: 8px 0 12px; color: #46566c; font-size: 14px; }
+
+/* ---------------- code block ---------------- */
+.code-wrap { position: relative; margin: 8px 0; }
+.code-lang {
+  position: absolute; top: 0; left: 0; font-family: var(--mono); font-size: 10px; font-weight: 700;
+  color: #fff; padding: 3px 8px; border-radius: 9px 0 9px 0; letter-spacing: .5px; z-index: 2;
+}
+.code-lang.lang-html { background: var(--html); }
+.code-lang.lang-css  { background: var(--css); }
+.code-lang.lang-js   { background: var(--js); }
+.code-lang.lang-php  { background: var(--php); }
+.code-copy {
+  position: absolute; top: 5px; right: 8px; z-index: 2;
+  background: rgba(255,255,255,.08); color: #aebfdb; border: 1px solid #2c3e5e;
+  font-family: var(--sans); font-size: 11px; padding: 3px 9px; border-radius: 6px; cursor: pointer;
+}
+.code-copy:hover { color: #fff; border-color: #4a5f86; }
+pre.code {
+  margin: 0; background: var(--code-bg); color: #dbe4f1; border-radius: 9px;
+  padding: 26px 14px 14px; overflow-x: auto; font-family: var(--mono);
+  font-size: 12.8px; line-height: 1.6; tab-size: 2;
+}
+pre.code code { font-family: inherit; }
+
+/* token colors */
+.c-com  { color: #6b829e; font-style: italic; }
+.c-str  { color: #9ece6a; }
+.c-kw   { color: #7aa2f7; font-weight: 600; }
+.c-num  { color: #e0954e; }
+.c-var  { color: #56cfe1; }
+.c-tag  { color: #f7768e; }
+.c-attr { color: #e0af68; }
+.c-prop { color: #56cfe1; }
+.c-punc { color: #8a9bb8; }
+
+/* ---------------- actions + stage ---------------- */
+.card-actions { display: flex; align-items: center; gap: 8px; margin-top: 12px; flex-wrap: wrap; }
+.btn {
+  font-family: var(--sans); font-size: 13px; font-weight: 600; cursor: pointer;
+  border-radius: 8px; padding: 8px 16px; border: 1px solid transparent; transition: all .15s ease;
+}
+.btn-run { background: var(--primary); color: #fff; }
+.btn-run:hover { background: var(--primary-dark); }
+.btn-ghost { background: #fff; color: var(--primary); border-color: var(--primary); }
+.btn-ghost:hover { background: #eef2ff; }
+.server-note { font-size: 12.5px; color: var(--php); font-weight: 600; }
+
+.stage { margin-top: 12px; }
+.stage:empty { margin-top: 0; }
+
+.preview-bar {
+  background: #11203a; color: #9fb4d8; font-size: 11px; font-weight: 700; letter-spacing: 1px;
+  text-transform: uppercase; padding: 6px 12px; border-radius: 9px 9px 0 0;
+}
+.preview {
+  width: 100%; min-height: 90px; height: 190px; border: 1px solid #11203a; border-top: 0;
+  background: #fff; border-radius: 0 0 9px 9px; display: block;
+}
+.console {
+  background: #0a1422; color: #cdd9ec; font-family: var(--mono); font-size: 12px;
+  padding: 8px 12px; border-radius: 0 0 9px 9px; margin-top: -3px; max-height: 150px; overflow-y: auto;
+  border: 1px solid #11203a; border-top: 1px dashed #2c3e5e;
+}
+.c-line { white-space: pre-wrap; padding: 1px 0; }
+.c-line.c-error, .c-line.c-alert { color: #f7a072; }
+.c-line.c-warn { color: #e0af68; }
+
+.expected {
+  background: #f6f9fd; border: 1px solid var(--line); border-radius: 9px; overflow: hidden;
+}
+.expected-label {
+  font-size: 11px; font-weight: 700; letter-spacing: 1px; text-transform: uppercase;
+  color: var(--php); background: #f3eeff; padding: 6px 12px; border-bottom: 1px solid #e7dcff;
+}
+.expected pre {
+  margin: 0; padding: 10px 12px; font-family: var(--mono); font-size: 12.5px;
+  white-space: pre-wrap; color: #2a3850;
+}
+
+/* editor */
+.editor {
+  width: 100%; background: var(--code-bg); color: #e6edf6; border: 1px solid #2c3e5e;
+  border-radius: 9px; padding: 12px 14px; font-family: var(--mono); font-size: 12.6px;
+  line-height: 1.55; resize: vertical; tab-size: 2;
+}
+.editor:focus { outline: 2px solid var(--primary); }
+.editor-row { margin: 8px 0; }
+.stage-inner { margin-top: 4px; }
+
+/* ---------------- responsive ---------------- */
+@media (max-width: 820px) {
+  .shell { flex-direction: column; }
+  .sidebar {
+    flex: 0 0 auto; max-height: 132px; display: flex; flex-wrap: nowrap; overflow-x: auto;
+    gap: 6px; padding: 10px;
+  }
+  .side-title { display: none; }
+  .side-item { flex: 0 0 auto; width: auto; }
+  .side-text { white-space: nowrap; }
+  .main { padding: 18px 16px 50px; }
+  .topbar { flex-wrap: wrap; gap: 10px; }
+  .search-wrap { order: 3; width: 100%; }
+  #search { width: 100%; max-width: none; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  * { transition: none !important; }
+}
+
+/* ---------------- dark mode ---------------- */
+:root[data-theme="dark"] {
+  --bg: #0b1322;
+  --card: #111d31;
+  --ink: #e6edf6;
+  --muted: #8da3c0;
+  --line: #22324d;
+}
+[data-theme="dark"] .card { box-shadow: none; }
+[data-theme="dark"] .card-note { color: #aebccf; }
+[data-theme="dark"] .note-banner {
+  background: rgba(227,76,38,.12); color: #fca982; border-color: rgba(227,76,38,.35);
+}
+[data-theme="dark"] .expected { background: #0e1a2c; }
+[data-theme="dark"] .expected pre { color: #cdd9ec; }
+[data-theme="dark"] .expected-label {
+  background: rgba(139,92,246,.16); color: #c4b5fd; border-bottom-color: rgba(139,92,246,.3);
+}
+[data-theme="dark"] .btn-ghost { background: #16243c; }
+[data-theme="dark"] .btn-ghost:hover { background: #1d2f4d; }
+
+/* theme toggle button */
+.icon-btn {
+  width: 34px; height: 34px; border-radius: 8px; border: 1px solid #2b3c5c;
+  background: transparent; color: #c7d3e8; cursor: pointer; font-size: 15px; line-height: 1;
+  display: flex; align-items: center; justify-content: center; flex: 0 0 auto;
+  transition: all .15s ease;
+}
+.icon-btn:hover { border-color: #4a5f86; color: #fff; }
+
+/* içerik uyarısı (disclaimer) */
+.disclaimer {
+  margin: 14px 0 0; display: flex; align-items: center; gap: 9px;
+  font-size: 14.5px; font-weight: 600; font-style: normal; color: #92400e;
+  background: #fef3c7; border: 1px solid #fbbf24; border-left: 6px solid #f59e0b;
+  padding: 11px 15px; border-radius: 9px;
+}
+.disclaimer::before { content: "⚠"; font-size: 19px; line-height: 1; flex: 0 0 auto; }
+[data-theme="dark"] .disclaimer {
+  background: rgba(245,158,11,.14); color: #fcd34d; border-color: rgba(245,158,11,.45);
+}
+
+/* araştırma ödevi rozeti */
+.badge-research {
+  display: inline-block; background: var(--kavram); color: #fff; font-size: 9.5px;
+  font-weight: 800; letter-spacing: .5px; padding: 2px 7px; border-radius: 10px;
+  margin-left: 8px; vertical-align: middle;
+}
+/* terim listesi (kavram kartları) */
+.term-list { margin: 10px 0 0; }
+.term-list dt { font-weight: 700; color: var(--ink); margin-top: 9px; font-size: 14px; }
+.term-list dd { margin: 2px 0 0; color: var(--muted); font-size: 13.5px; line-height: 1.5; }
+
+/* ekler & hakkında */
+.about-card { border-left: 5px solid var(--primary); }
+.about-credit {
+  margin: 10px 0 0; font-size: 16px; line-height: 1.7; color: var(--ink); font-weight: 500;
+}
+.side-sep { height: 1px; background: rgba(255,255,255,.10); margin: 12px 8px; }
+.side-about .side-num { font-size: 15px; }
+@media (max-width: 820px) {
+  .side-sep { width: 1px; height: 28px; margin: 0 4px; align-self: center; flex: 0 0 auto; }
+}
+
+/* ---------------- kaydırma çubuğu ---------------- */
+/* Firefox */
+* { scrollbar-width: thin; }
+.main { scrollbar-color: #c2ccdb transparent; }
+[data-theme="dark"] .main { scrollbar-color: #33425e transparent; }
+.sidebar, .console, .editor, pre.code, .expected pre { scrollbar-color: #3a4a66 transparent; }
+
+/* WebKit (Chrome, Edge, Safari) */
+::-webkit-scrollbar { width: 11px; height: 11px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb {
+  background: #c2ccdb; border-radius: 8px;
+  border: 2px solid transparent; background-clip: padding-box;
+}
+::-webkit-scrollbar-thumb:hover { background: #9fb0cc; background-clip: padding-box; }
+[data-theme="dark"] ::-webkit-scrollbar-thumb { background: #33425e; background-clip: padding-box; }
+[data-theme="dark"] ::-webkit-scrollbar-thumb:hover { background: #455572; background-clip: padding-box; }
+
+/* her zaman koyu zeminli alanlar (kenar çubuğu, konsol, kod, editör) */
+.sidebar::-webkit-scrollbar-thumb,
+.console::-webkit-scrollbar-thumb,
+.editor::-webkit-scrollbar-thumb,
+pre.code::-webkit-scrollbar-thumb,
+.expected pre::-webkit-scrollbar-thumb {
+  background: #3a4a66; background-clip: padding-box;
+}
+.sidebar::-webkit-scrollbar-thumb:hover,
+.console::-webkit-scrollbar-thumb:hover,
+pre.code::-webkit-scrollbar-thumb:hover {
+  background: #4a5f86; background-clip: padding-box;
+}
+
+  </style>
+</head>
+<body>
+  <header class="topbar">
+    <div class="brand">
+      <div class="row">
+        <span id="app-title">Web Programlama</span>
+        <span id="app-sub">Kod Atölyesi</span>
+      </div>
+    </div>
+    <div class="chips" id="chips"></div>
+    <div class="search-wrap">
+      <input id="search" type="search" placeholder="Konu veya kod ara…" aria-label="Ara">
+    </div>
+    <button id="theme-toggle" class="icon-btn" type="button" aria-label="Tema değiştir">☾</button>
+    <button id="fs-toggle" class="icon-btn" type="button" aria-label="Tam ekran">⛶</button>
+  </header>
+
+  <div class="shell">
+    <nav class="sidebar" id="sidebar" aria-label="Haftalar"></nav>
+    <main class="main" id="main"></main>
+  </div>
+
+  <!-- Sıralama önemli: önce vurgulayıcı ve veri, sonra uygulama -->
+  <script>
+/* Hafif, güvenli sözdizimi vurgulayıcı (html/css/js/php). */
+const HL = (function () {
+  function esc(s) {
+    return s.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
+  }
+
+  const JS_KW = new Set(("let const var function return if else for while do switch case break " +
+    "continue default new this typeof try catch finally throw true false null undefined of in " +
+    "class extends void delete instanceof").split(" "));
+  const PHP_KW = new Set(("echo print function return if else elseif for foreach while do switch case " +
+    "break continue default as global static const new class public private protected true false null " +
+    "array isset empty unset require include var_dump print_r header exit and or").split(" "));
+
+  function hlWords(text, KW) {
+    return esc(text).replace(/\b([A-Za-z_]\w*)\b/g, (w) =>
+      KW.has(w) ? '<span class="c-kw">' + w + "</span>" : w);
+  }
+
+  // js & php
+  function hlCode(src, isPhp) {
+    const re = /(\/\*[\s\S]*?\*\/|\/\/[^\n]*|#[^\n]*)|("(?:\\.|[^"\\])*"|'(?:\\.|[^'\\])*'|`(?:\\.|[^`\\])*`)|(\$[A-Za-z_]\w*)|(\b\d+\.?\d*\b)/g;
+    const KW = isPhp ? PHP_KW : JS_KW;
+    let out = "", last = 0, m;
+    while ((m = re.exec(src))) {
+      out += hlWords(src.slice(last, m.index), KW);
+      if (m[1]) out += '<span class="c-com">' + esc(m[1]) + "</span>";
+      else if (m[2]) out += '<span class="c-str">' + esc(m[2]) + "</span>";
+      else if (m[3]) out += '<span class="c-var">' + esc(m[3]) + "</span>";
+      else if (m[4]) out += '<span class="c-num">' + esc(m[4]) + "</span>";
+      last = re.lastIndex;
+    }
+    out += hlWords(src.slice(last), KW);
+    return out;
+  }
+
+  function hlCssText(text) {
+    return esc(text).replace(/([a-zA-Z-]+)(\s*:)/g, '<span class="c-prop">$1</span>$2');
+  }
+  function hlCss(src) {
+    const re = /(\/\*[\s\S]*?\*\/)|("(?:\\.|[^"\\])*"|'(?:\\.|[^'\\])*')|(#[0-9a-fA-F]{3,8}\b)|(-?\d+\.?\d*(?:px|em|rem|%|vw|vh|fr|s|deg)?\b)|(@[a-z-]+)/g;
+    let out = "", last = 0, m;
+    while ((m = re.exec(src))) {
+      out += hlCssText(src.slice(last, m.index));
+      if (m[1]) out += '<span class="c-com">' + esc(m[1]) + "</span>";
+      else if (m[2]) out += '<span class="c-str">' + esc(m[2]) + "</span>";
+      else if (m[3] || m[4]) out += '<span class="c-num">' + esc(m[3] || m[4]) + "</span>";
+      else if (m[5]) out += '<span class="c-kw">' + esc(m[5]) + "</span>";
+      last = re.lastIndex;
+    }
+    out += hlCssText(src.slice(last));
+    return out;
+  }
+
+  function hlTag(tag) {
+    const inner = tag.slice(1, -1);
+    let html = esc(inner).replace(
+      /([a-zA-Z-]+)=("(?:[^"]*)"|'(?:[^']*)')/g,
+      '<span class="c-attr">$1</span>=<span class="c-str">$2</span>'
+    );
+    html = html.replace(/^(\/?)([a-zA-Z0-9]+)/, '$1<span class="c-tag">$2</span>');
+    return '<span class="c-punc">&lt;</span>' + html + '<span class="c-punc">&gt;</span>';
+  }
+  function hlHtml(src) {
+    const re = /(<!--[\s\S]*?-->)|(<\/?[a-zA-Z][^>]*>)/g;
+    let out = "", last = 0, m;
+    while ((m = re.exec(src))) {
+      out += esc(src.slice(last, m.index));
+      if (m[1]) out += '<span class="c-com">' + esc(m[1]) + "</span>";
+      else out += hlTag(m[2]);
+      last = re.lastIndex;
+    }
+    out += esc(src.slice(last));
+    return out;
+  }
+
+  return function highlight(code, lang) {
+    try {
+      if (lang === "html") return hlHtml(code);
+      if (lang === "css") return hlCss(code);
+      if (lang === "php") return hlCode(code, true);
+      if (lang === "js") return hlCode(code, false);
+      return esc(code);
+    } catch (e) {
+      return esc(code);
+    }
+  };
+})();
+
+  </script>
+  <script>
+/* =====================================================================
+   Web Programlama — Kod Atölyesi
+   Tüm hafta kod örnekleri tek bir veri yapısında.
+   lang: 'html' | 'css' | 'js' | 'php' | 'kavram'
+   blocks: gösterilen + çalıştırılan kod parçaları
+   run: tarayıcıda çalıştırılabilir mi (html/css/js)
+   output: çalıştırılamayan (php) örnekler için beklenen çıktı
+   added: true  -> derste eksik olan, sonradan eklenen CSS konuları
+===================================================================== */
+const COURSE = {
+  meta: {
+    title: "Web Programlama",
+    subtitle: "Kod Atölyesi"
+  },
+  weeks: [
+  /* ============================ HAFTA 1 ============================ */
+  {
+    id: 1, title: "Giriş ve Geliştirme Ortamı", langs: ["html", "kavram"],
+    summary: "Web sunucu, localhost, Laragon ve ilk HTML sayfası.",
+    topics: [
+      {
+        name: "İlk HTML sayfası", lang: "html", run: true,
+        note: "Tarayıcıda çalışan en küçük geçerli HTML belgesi. HTML = iskelet, CSS = kıyafet, JS = hareket.",
+        blocks: [{ lang: "html", text:
+`<!DOCTYPE html>
+<html lang="tr">
+  <head>
+    <meta charset="UTF-8">
+    <title>İlk Sayfam</title>
+  </head>
+  <body>
+    <h1>Merhaba Dünya</h1>
+    <p>Bu benim ilk web sayfam.</p>
+  </body>
+</html>` }]
+      },
+      {
+        name: "Localhost ve web sunucu", lang: "kavram", run: false,
+        note: "Localhost, kendi bilgisayarını sunucu gibi kullanmaktır. İnternet gerekmez; sadece senin bilgisayarında çalışır.",
+        blocks: [{ lang: "html", text:
+`IP adresi : 127.0.0.1
+Alan adı  : localhost
+Adres     : http://localhost
+
+Paket sunucular: WAMP · XAMPP · MAMP · Laragon
+Sunucu yazılımı: Apache · Nginx · IIS · LiteSpeed` }],
+        output: "Kavramsal içerik — çalıştırma gerektirmez."
+      }
+    ]
+  },
+
+  /* ============================ HAFTA 2 ============================ */
+  {
+    id: 2, title: "HTML", langs: ["html"],
+    summary: "Sayfa yapısı, etiketler, nitelikler, box model, form elemanları.",
+    topics: [
+      {
+        name: "Elemanlar ve nitelikler", lang: "html", run: true,
+        note: "Eleman = başlangıç etiketi + içerik + bitiş etiketi. Nitelikler (attribute) ek bilgi verir: ad=\"değer\".",
+        blocks: [{ lang: "html", text:
+`<h1>My First Heading</h1>
+<p>My first paragraph.</p>
+<img src="https://picsum.photos/120" alt="Örnek resim">
+<p style="color:red;">Bu paragraf kırmızı.</p>` }]
+      },
+      {
+        name: "Head etiketleri (meta, link, title)", lang: "html", run: true,
+        note: "charset Türkçe karakteri, viewport mobil uyumu, description SEO açıklamasını sağlar.",
+        blocks: [{ lang: "html", text:
+`<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="HTML ve CSS temel dersleri">
+  <title>Sayfa Başlığı</title>
+</head>
+<body>
+  <h2>Sekme başlığına ve mobil uyuma bak</h2>
+</body>` }]
+      },
+      {
+        name: "Yorum ve DOCTYPE", lang: "html", run: true,
+        note: "<!DOCTYPE html> tarayıcıyı standart modda çalıştırır. Yorumlar <!-- --> ile yazılır, sayfada görünmez.",
+        blocks: [{ lang: "html", text:
+`<!DOCTYPE html>
+<!-- Bu başlık şu an aktif -->
+<h1>Merhaba Dünya</h1>
+<!-- <p>Bu paragraf görünmez</p> -->` }]
+      },
+      {
+        name: "Tablo (table, tr, th, td)", lang: "html", run: true,
+        note: "tr satır, th başlık hücresi, td veri hücresidir. colspan/rowspan ile hücre birleştirilir.",
+        blocks: [{ lang: "html", text:
+`<table border="1" cellpadding="6">
+  <tr><th>Marka</th><th>Stok</th></tr>
+  <tr><td>Volvo</td><td>22</td></tr>
+  <tr><td>BMW</td><td>15</td></tr>
+</table>` }]
+      },
+      {
+        name: "Form ve girdi türleri", lang: "html", run: true,
+        note: "form action+method ile veriyi gönderir. label, input'a for/id ile bağlanır (erişilebilirlik).",
+        blocks: [{ lang: "html", text:
+`<form action="kaydet.php" method="post">
+  <label for="ad">Ad:</label>
+  <input id="ad" type="text" name="ad" placeholder="Adınız" required><br><br>
+
+  <label for="ep">E-posta:</label>
+  <input id="ep" type="email" name="email"><br><br>
+
+  <label for="sehir">Şehir:</label>
+  <select id="sehir" name="sehir">
+    <option value="34">İstanbul</option>
+    <option value="6" selected>Ankara</option>
+  </select><br><br>
+
+  <textarea name="mesaj" rows="3" cols="30" placeholder="Mesaj"></textarea><br><br>
+  <button type="submit">Gönder</button>
+</form>` }]
+      },
+      {
+        name: "Listeler (ul, ol, li)", lang: "html", run: true,
+        note: "ul sırasız (madde), ol sıralı (numara) liste. li öğeleri içerir.",
+        blocks: [{ lang: "html", text:
+`<ul>
+  <li>Elma</li><li>Armut</li><li>Muz</li>
+</ul>
+<ol type="I">
+  <li>Birinci</li><li>İkinci</li>
+</ol>` }]
+      },
+      {
+        name: "div / span (block vs inline)", lang: "html", run: true,
+        note: "div block-level kapsayıcıdır (yeni satır, %100 genişlik). span inline'dır (içeriği kadar yer kaplar).",
+        blocks: [{ lang: "html", text:
+`<div style="background:#e8f0fb;padding:8px">
+  Bu bir <span style="color:#b1004b;font-weight:bold">span</span> içeren div bloğudur.
+</div>
+<div style="background:#fde68a;padding:8px;margin-top:6px">İkinci blok (yeni satır)</div>` }]
+      },
+      {
+        name: "Bağlantılar (a)", lang: "html", run: true,
+        note: "href hedefi belirtir. target=\"_blank\" yeni sekmede açar. Sayfa içi bağlantı #id ile yapılır.",
+        blocks: [{ lang: "html", text:
+`<a href="https://example.com" target="_blank">Siteye git (yeni sekme)</a><br>
+<a href="mailto:info@example.com">Mail at</a><br>
+<a href="#iletisim">İletişim bölümüne in</a>
+<div id="iletisim" style="margin-top:40px">İletişim bölümü</div>` }]
+      }
+    ]
+  },
+
+  /* ====================== HAFTA 3 — CSS (EKLENDİ) ===================== */
+  {
+    id: 3, title: "CSS — Temeller", langs: ["css"], added: true,
+    summary: "Seçiciler, birimler, box model, öncelik. (Eksik ders dosyası yerine eklendi.)",
+    topics: [
+      {
+        name: "CSS yazma yöntemleri", lang: "css", run: true,
+        note: "Inline (style), internal (<style>) ve external (<link>) olmak üzere 3 yöntem. External tercih edilir.",
+        blocks: [
+          { lang: "html", text:
+`<style>
+  /* internal CSS */
+  .baslik { color: #14305c; }
+</style>
+<h2 class="baslik">Internal CSS ile renklendi</h2>
+<p style="color:#b1004b;">Inline CSS ile renklendi</p>` }
+        ]
+      },
+      {
+        name: "Seçiciler (element, class, id, grup)", lang: "css", run: true,
+        note: "class (.) tekrar kullanılabilir, id (#) benzersizdir. nav a gibi iç içe seçiciler de vardır.",
+        blocks: [
+          { lang: "css", text:
+`p          { color:#333; }            /* element */
+.vurgu     { background:#fde68a; }    /* class   */
+#ozel      { font-weight:bold; }      /* id      */
+h2, .vurgu { font-family: Arial; }    /* grup    */` },
+          { lang: "html", text:
+`<h2>Başlık (grup seçici)</h2>
+<p>Normal paragraf.</p>
+<p class="vurgu">Class ile vurgulu.</p>
+<p id="ozel">Id ile kalın.</p>` }
+        ]
+      },
+      {
+        name: "Öncelik (specificity) ve cascade", lang: "css", run: true,
+        note: "Inline > id > class > element. Eşitlikte sonra yazılan kazanır. !important hepsini ezer.",
+        blocks: [
+          { lang: "css", text:
+`p        { color: gray; }   /* en zayıf */
+.metin   { color: blue; }   /* class daha güçlü */
+#tek     { color: green; }  /* id en güçlü */`},
+          { lang: "html", text:
+`<p>Element kuralı → gri</p>
+<p class="metin">Class kuralı → mavi</p>
+<p id="tek" class="metin">Id kazanır → yeşil</p>` }
+        ]
+      },
+      {
+        name: "Renk ve ölçü birimleri", lang: "css", run: true,
+        note: "Mutlak: px. Göreli: %, em, rem, vw/vh. Renk: isim, #hex, rgb(), hsl().",
+        blocks: [
+          { lang: "css", text:
+`.kutu1 { background:#e34c26; width:50%;  }
+.kutu2 { background:rgb(41,101,241); width:200px; }
+.kutu3 { background:hsl(265,80%,60%); width:15rem; }
+.kutu1,.kutu2,.kutu3 { color:#fff; padding:10px; margin:6px 0; }` },
+          { lang: "html", text:
+`<div class="kutu1">%50 genişlik · hex</div>
+<div class="kutu2">200px · rgb()</div>
+<div class="kutu3">15rem · hsl()</div>` }
+        ]
+      },
+      {
+        name: "Metin ve font özellikleri", lang: "css", run: true,
+        note: "font-family, font-size, font-weight, line-height, text-align, text-decoration.",
+        blocks: [
+          { lang: "css", text:
+`p {
+  color:#222;
+  font-family: Arial, sans-serif;
+  font-size: 1.1rem;
+  font-weight: bold;
+  line-height: 1.8;
+  text-align: justify;
+  text-decoration: underline;
+}` },
+          { lang: "html", text: `<p>Metin biçimlendirme örneği. Kalın, altı çizili ve iki yana yaslı bir paragraf.</p>` }
+        ]
+      },
+      {
+        name: "Box model (margin/padding/border)", lang: "css", run: true,
+        note: "Content → Padding → Border → Margin. box-sizing:border-box genişliğe padding+border'ı dahil eder.",
+        blocks: [
+          { lang: "css", text:
+`.kutu {
+  width: 240px;
+  padding: 16px;
+  border: 3px solid #14305c;
+  margin: 20px auto;
+  background:#eff6ff;
+  box-sizing: border-box;
+}` },
+          { lang: "html", text: `<div class="kutu">Ortalanmış, kenarlıklı ve iç boşluklu kutu.</div>` }
+        ]
+      }
+    ]
+  },
+
+  /* ===================== HAFTA 4 — CSS (EKLENDİ) ===================== */
+  {
+    id: 4, title: "CSS — Düzen & Responsive", langs: ["css"], added: true,
+    summary: "display, position, Flexbox, Grid, media query. (Eksik ders dosyası yerine eklendi.)",
+    topics: [
+      {
+        name: "display: block / inline / inline-block / none", lang: "css", run: true,
+        note: "block yeni satır + boyut alır, inline almaz, inline-block ikisini birleştirir, none gizler.",
+        blocks: [
+          { lang: "css", text:
+`span.kutu { display:inline-block; width:90px; height:40px;
+  background:#2965f1; color:#fff; text-align:center; line-height:40px; margin:3px; }` },
+          { lang: "html", text:
+`<span class="kutu">A</span>
+<span class="kutu">B</span>
+<span class="kutu">C</span>
+<p>inline-block sayesinde yan yana, ama boyut alabiliyorlar.</p>` }
+        ]
+      },
+      {
+        name: "position (relative / absolute)", lang: "css", run: true,
+        note: "absolute, en yakın konumlu (relative) üst elemana göre yerleşir ve akıştan çıkar.",
+        blocks: [
+          { lang: "css", text:
+`.dis { position:relative; height:120px; background:#e8f0fb; }
+.rozet { position:absolute; top:10px; right:10px;
+  background:#e34c26; color:#fff; padding:4px 10px; border-radius:12px; }` },
+          { lang: "html", text:
+`<div class="dis">
+  <span class="rozet">YENİ</span>
+  Üst kutu relative, rozet absolute ile sağ üste yapıştı.
+</div>` }
+        ]
+      },
+      {
+        name: "Flexbox", lang: "css", run: true,
+        note: "Tek eksenli hizalama. justify-content yatay, align-items dikey hizalar. gap aralık verir.",
+        blocks: [
+          { lang: "css", text:
+`.bar {
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  gap:12px;
+  background:#14305c; padding:12px; border-radius:8px;
+}
+.bar div { background:#fff; padding:10px 16px; border-radius:6px; }` },
+          { lang: "html", text:
+`<div class="bar">
+  <div>Sol</div><div>Orta</div><div>Sağ</div>
+</div>` }
+        ]
+      },
+      {
+        name: "Grid", lang: "css", run: true,
+        note: "İki eksenli düzen. grid-template-columns sütunları, gap aralığı belirler. 1fr = eşit pay.",
+        blocks: [
+          { lang: "css", text:
+`.galeri {
+  display:grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap:10px;
+}
+.galeri div { background:#8b5cf6; color:#fff; padding:20px; text-align:center; border-radius:6px; }` },
+          { lang: "html", text:
+`<div class="galeri">
+  <div>1</div><div>2</div><div>3</div>
+  <div>4</div><div>5</div><div>6</div>
+</div>` }
+        ]
+      },
+      {
+        name: "Responsive — media query", lang: "css", run: true,
+        note: "Önizleme penceresini daraltıp genişlettiğinde düzenin değiştiğini görürsün (eşik 480px).",
+        blocks: [
+          { lang: "css", text:
+`.kutular { display:flex; gap:8px; }
+.kutular div { flex:1; background:#2965f1; color:#fff; padding:20px; text-align:center; }
+
+@media (max-width: 480px) {
+  .kutular { flex-direction: column; }   /* dar ekranda alt alta */
+  .kutular div { background:#e34c26; }
+}` },
+          { lang: "html", text:
+`<div class="kutular"><div>A</div><div>B</div><div>C</div></div>
+<p>Pencereyi daralt: yatay düzen dikeye döner.</p>` }
+        ]
+      },
+      {
+        name: "Geçiş ve hover (transition)", lang: "css", run: true,
+        note: "transition ile stil değişimleri yumuşatılır. :hover fare üzerine gelince devreye girer.",
+        blocks: [
+          { lang: "css", text:
+`.btn {
+  background:#3b5bdb; color:#fff; border:none;
+  padding:12px 22px; border-radius:8px; cursor:pointer;
+  transition: background .3s ease, transform .15s ease;
+}
+.btn:hover { background:#1c3aa9; transform: translateY(-2px); }` },
+          { lang: "html", text: `<button class="btn">Üzerime gel</button>` }
+        ]
+      }
+    ]
+  },
+
+  /* ============================ HAFTA 5 ============================ */
+  {
+    id: 5, title: "JavaScript — Temeller", langs: ["js"],
+    summary: "Çıktı yöntemleri, değişkenler, veri tipleri, operatörler, kontrol yapıları, string.",
+    topics: [
+      {
+        name: "Çıktı yöntemleri", lang: "js", run: true,
+        note: "innerHTML öğeye yazar, console.log konsola, alert pencereye. (Konsol/uyarı çıktısı aşağıda toplanır.)",
+        blocks: [
+          { lang: "html", text: `<p id="demo"></p>` },
+          { lang: "js", text:
+`document.getElementById("demo").innerHTML = "<b>innerHTML</b> ile yazıldı";
+console.log("console.log:", 5 + 6);
+alert("alert: " + (5 + 6));` }
+        ]
+      },
+      {
+        name: "Değişkenler: var / let / const", lang: "js", run: true,
+        note: "Değişmeyecekse const, değişecekse let; var kullanma. let/const blok kapsamlıdır.",
+        blocks: [
+          { lang: "js", text:
+`let ad = "Ali";
+const PI = 3.14159;
+ad = "Veli";          // let yeniden atanabilir
+console.log(ad, PI);
+
+{ let x = 2; }        // blok kapsamı
+// console.log(x);    // hata: x burada yok
+console.log("typeof PI =", typeof PI);` }
+        ]
+      },
+      {
+        name: "Hoisting (let TDZ)", lang: "js", run: true,
+        note: "let/const tanımlanmadan önce kullanılamaz (ReferenceError). Konsolda hatayı gör.",
+        blocks: [
+          { lang: "js", text:
+`try {
+  console.log(sayi);   // tanımdan önce kullanım
+  let sayi = 5;
+} catch (e) {
+  console.log("Hata:", e.name, "-", e.message);
+}` }
+        ]
+      },
+      {
+        name: "Veri tipleri ve typeof", lang: "js", run: true,
+        note: "8 tip: String, Number, BigInt, Boolean, Object, Undefined, Null, Symbol.",
+        blocks: [
+          { lang: "js", text:
+`console.log(typeof "Selam");   // string
+console.log(typeof 3.14);      // number
+console.log(typeof true);      // boolean
+console.log(typeof {a:1});     // object
+console.log("'5' + 2 =", "5" + 2);  // "52" birleştirme
+console.log("2 + 3 + '5' =", 2 + 3 + "5"); // "55"` }
+        ]
+      },
+      {
+        name: "Operatörler", lang: "js", run: true,
+        note: "Aritmetik, atama, karşılaştırma. == değer, === değer+tip karşılaştırır.",
+        blocks: [
+          { lang: "js", text:
+`let x = 5;
+console.log("x % 2 =", x % 2);
+console.log("x ** 2 =", x ** 2);
+console.log("5 == '5' :", 5 == "5");   // true
+console.log("5 === '5':", 5 === "5");  // false
+console.log("&&:", (x < 10 && x > 1)); // true` }
+        ]
+      },
+      {
+        name: "if / else / ternary", lang: "js", run: true,
+        note: "Üçlü operatör (? :) kısa if-else'tir.",
+        blocks: [
+          { lang: "js", text:
+`let yas = 16;
+if (yas < 18) {
+  console.log("Çocuk");
+} else {
+  console.log("Yetişkin");
+}
+let durum = (yas < 18) ? "Minor" : "Adult";
+console.log("Ternary:", durum);` }
+        ]
+      },
+      {
+        name: "switch", lang: "js", run: true,
+        note: "switch katı karşılaştırma (===) kullanır. break unutulmamalı.",
+        blocks: [
+          { lang: "js", text:
+`let gun = new Date().getDay();
+switch (gun) {
+  case 0: console.log("Pazar"); break;
+  case 6: console.log("Cumartesi"); break;
+  default: console.log("Hafta içi");
+}` }
+        ]
+      },
+      {
+        name: "Döngüler ve break/continue", lang: "js", run: true,
+        note: "for ve while. break döngüden çıkar, continue mevcut adımı atlar.",
+        blocks: [
+          { lang: "js", text:
+`for (let i = 0; i < 5; i++) {
+  if (i === 3) continue;   // 3'ü atla
+  console.log("i =", i);
+}
+let n = 0;
+while (n < 5) { if (n === 2) break; console.log("n =", n); n++; }` }
+        ]
+      },
+      {
+        name: "String metotları", lang: "js", run: true,
+        note: "Metotlar orijinali değiştirmez, yeni string döndürür. Template literal: `${...}`.",
+        blocks: [
+          { lang: "js", text:
+`let t = "Hello World";
+console.log(t.length);
+console.log(t.toUpperCase());
+console.log(t.slice(0, 5));
+console.log(t.replace("World", "JS"));
+console.log(t.split(" "));
+let a = 10, b = 20;
+console.log(\`Toplam: \${a + b}\`);` }
+        ]
+      }
+    ]
+  },
+
+  /* ============================ HAFTA 6 ============================ */
+  {
+    id: 6, title: "JavaScript — Fonksiyon, Nesne, DOM", langs: ["js"],
+    summary: "Numbers, fonksiyonlar, nesneler, diziler, hatalar, DOM, olaylar.",
+    topics: [
+      {
+        name: "Numbers, NaN, Infinity", lang: "js", run: true,
+        note: "Tek tip sayı (64-bit). NaN geçersiz sayı; Infinity sıfıra bölmede oluşur.",
+        blocks: [
+          { lang: "js", text:
+`console.log("100" / "10");        // 10 (sayıya çevirir)
+console.log(100 / "Apple");       // NaN
+console.log(isNaN(100 / "Apple"));// true
+console.log(1 / 0);               // Infinity
+console.log((9.656).toFixed(2));  // "9.66"` }
+        ]
+      },
+      {
+        name: "Fonksiyonlar (3 yazım)", lang: "js", run: true,
+        note: "Bildirim hoisted'tır; ifade ve ok fonksiyonu değildir.",
+        blocks: [
+          { lang: "js", text:
+`function topla(a, b) { return a + b; }      // bildirim
+const carp = function (a, b){ return a*b; };// ifade
+const kare = x => x * x;                     // ok fonksiyonu
+console.log(topla(2,3), carp(4,3), kare(5));` }
+        ]
+      },
+      {
+        name: "Parametreler (default, rest)", lang: "js", run: true,
+        note: "Varsayılan değer ve ...rest ile değişken sayıda argüman.",
+        blocks: [
+          { lang: "js", text:
+`function selam(ad = "Misafir") { return "Merhaba " + ad; }
+console.log(selam());
+console.log(selam("Ayşe"));
+
+function topAll(...sayilar) {
+  return sayilar.reduce((t, s) => t + s, 0);
+}
+console.log("Toplam:", topAll(1, 2, 3, 4));` }
+        ]
+      },
+      {
+        name: "Nesneler (objects)", lang: "js", run: true,
+        note: "Anahtar-değer çiftleri. Erişim: nesne.ozellik veya nesne['ozellik']. this metotlarda kullanılır.",
+        blocks: [
+          { lang: "js", text:
+`const kisi = {
+  ad: "John", soyad: "Doe", yas: 50,
+  tamAd: function () { return this.ad + " " + this.soyad; }
+};
+console.log(kisi.ad);
+console.log(kisi["yas"]);
+console.log(kisi.tamAd());` }
+        ]
+      },
+      {
+        name: "Yapıcı fonksiyon (constructor)", lang: "js", run: true,
+        note: "Aynı türden çok nesne için new ile kullanılır.",
+        blocks: [
+          { lang: "js", text:
+`function Person(ad, yas) {
+  this.ad = ad;
+  this.yas = yas;
+}
+const baba = new Person("Ahmet", 45);
+const anne = new Person("Zeynep", 42);
+console.log(baba.ad, baba.yas);
+console.log(anne.ad, anne.yas);` }
+        ]
+      },
+      {
+        name: "Diziler ve metotları", lang: "js", run: true,
+        note: "push/pop, map/filter/reduce gibi metotlar. typeof dizi için 'object' döner; Array.isArray ile kontrol.",
+        blocks: [
+          { lang: "js", text:
+`const arabalar = ["Saab", "Volvo", "BMW"];
+arabalar.push("Audi");
+console.log(arabalar, "uzunluk:", arabalar.length);
+console.log(Array.isArray(arabalar));
+
+const sayilar = [1, 2, 3, 4];
+console.log("map :", sayilar.map(x => x * 2));
+console.log("filter:", sayilar.filter(x => x % 2 === 0));
+console.log("reduce:", sayilar.reduce((a, b) => a + b, 0));` }
+        ]
+      },
+      {
+        name: "Hatalar (try/catch/finally)", lang: "js", run: true,
+        note: "throw ile özel hata fırlatılır. finally her durumda çalışır.",
+        blocks: [
+          { lang: "js", text:
+`function kontrol(x) {
+  try {
+    if (isNaN(x)) throw "Sayı değil";
+    if (x > 10) throw "Çok büyük";
+    return "OK: " + x;
+  } catch (err) {
+    return "Hata: " + err;
+  } finally {
+    console.log("kontrol bitti");
+  }
+}
+console.log(kontrol(5));
+console.log(kontrol(99));` }
+        ]
+      },
+      {
+        name: "DOM — seçme ve değiştirme", lang: "js", run: true,
+        note: "getElementById / querySelector ile öğe seçilir; innerHTML, style ile değiştirilir.",
+        blocks: [
+          { lang: "html", text:
+`<p id="baslik">Eski başlık</p>
+<p class="metin">Bir paragraf</p>` },
+          { lang: "js", text:
+`document.getElementById("baslik").innerHTML = "Yeni başlık";
+const p = document.querySelector(".metin");
+p.style.color = "#3b5bdb";
+p.style.fontWeight = "bold";
+console.log("DOM güncellendi");` }
+        ]
+      },
+      {
+        name: "DOM — eleman oluşturma", lang: "js", run: true,
+        note: "createElement + appendChild ile yeni öğe eklenir.",
+        blocks: [
+          { lang: "html", text: `<ul id="liste"><li>Mevcut</li></ul>` },
+          { lang: "js", text:
+`const liste = document.getElementById("liste");
+["Elma", "Armut", "Muz"].forEach(meyve => {
+  const li = document.createElement("li");
+  li.textContent = meyve;
+  liste.appendChild(li);
+});` }
+        ]
+      },
+      {
+        name: "Olaylar (events)", lang: "js", run: true,
+        note: "addEventListener ile tıklama/tuş olayları dinlenir. Butona tıkla / kutuya yaz.",
+        blocks: [
+          { lang: "html", text:
+`<button id="btn">Tıkla</button>
+<input id="kutu" placeholder="Bir tuşa bas">
+<p id="cikti"></p>` },
+          { lang: "js", text:
+`let sayac = 0;
+document.getElementById("btn").addEventListener("click", () => {
+  sayac++;
+  document.getElementById("cikti").textContent = "Tıklama: " + sayac;
+});
+document.getElementById("kutu").addEventListener("keydown", (e) => {
+  document.getElementById("cikti").textContent = "Basılan tuş: " + e.key;
+});` }
+        ]
+      }
+    ]
+  },
+
+  /* ============================ HAFTA 7 ============================ */
+  {
+    id: 7, title: "PHP — Giriş ve Temeller", langs: ["php"],
+    summary: "Değişkenler, kapsam, veri tipleri, casting, string, sabitler.",
+    topics: [
+      {
+        name: "Echo ve PHP sürümü", lang: "php", run: false,
+        note: "PHP sunucuda çalışır, sonucu HTML olarak döner. Çalıştırmak için Laragon/XAMPP gerekir.",
+        blocks: [{ lang: "php", text:
+`<?php
+  echo "Merhaba PHP!";
+  echo "<br>";
+  echo "Sürüm: " . phpversion();
+?>` }],
+        output: "Merhaba PHP!\nSürüm: 8.x.x"
+      },
+      {
+        name: "Yorum ve değişkenler", lang: "php", run: false,
+        note: "Değişken $ ile başlar, büyük/küçük harf duyarlıdır. PHP gevşek tiplidir.",
+        blocks: [{ lang: "php", text:
+`<?php
+  // tek satır yorum    # bu da yorum
+  /* çok satır yorum */
+  $ad = "Ali";
+  $yas = 21;
+  echo "Ad: $ad, Yaş: $yas";
+  var_dump($yas);
+?>` }],
+        output: "Ad: Ali, Yaş: 21\nint(21)"
+      },
+      {
+        name: "Değişken kapsamı (global / static)", lang: "php", run: false,
+        note: "global anahtar kelimesi ile fonksiyon içinden global değişkene erişilir. static değer korunur.",
+        blocks: [{ lang: "php", text:
+`<?php
+  $x = 5; $y = 10;
+  function topla() {
+    global $x, $y;
+    $y = $x + $y;
+  }
+  topla();
+  echo $y;            // 15
+
+  function sayac() {
+    static $n = 0;
+    $n++;
+    echo $n;
+  }
+  sayac(); sayac(); sayac();   // 123
+?>` }],
+        output: "15123"
+      },
+      {
+        name: "Tür dönüştürme (casting)", lang: "php", run: false,
+        note: "Bir değeri açıkça başka tipe çevirme: (int), (float), (string), (bool), (array).",
+        blocks: [{ lang: "php", text:
+`<?php
+  $a = (int) "25 km";     // 25
+  $b = (float) "5.34 x";  // 5.34
+  $c = (string) true;     // "1"
+  $d = (array) 5;         // [5]
+  echo "$a | $b | $c | {$d[0]}";
+?>` }],
+        output: "25 | 5.34 | 1 | 5"
+      },
+      {
+        name: "String fonksiyonları", lang: "php", run: false,
+        note: "strlen, strtoupper, str_replace, explode, substr, strpos.",
+        blocks: [{ lang: "php", text:
+`<?php
+  $x = "Hello World";
+  echo strlen($x);                 // 11
+  echo "<br>" . strtoupper($x);    // HELLO WORLD
+  echo "<br>" . str_replace("World", "PHP", $x);
+  echo "<br>" . substr($x, 0, 5);  // Hello
+  print_r(explode(" ", $x));       // [Hello, World]
+?>` }],
+        output: "11\nHELLO WORLD\nHello PHP\nHello\nArray ( [0] => Hello [1] => World )"
+      },
+      {
+        name: "Sabitler (define / const)", lang: "php", run: false,
+        note: "Sabitler bir kez tanımlanır, değiştirilemez. Sihirli sabitler: __LINE__, __FILE__, __FUNCTION__ ...",
+        blocks: [{ lang: "php", text:
+`<?php
+  define("GREETING", "Welcome");
+  const PI = 3.1415;
+  echo GREETING . " - " . PI;
+  echo "<br>Satır: " . __LINE__;
+?>` }],
+        output: "Welcome - 3.1415\nSatır: 5"
+      }
+    ]
+  },
+
+  /* ============================ HAFTA 8 ============================ */
+  {
+    id: 8, title: "PHP — Operatörler & Döngüler", langs: ["php"],
+    summary: "Operatörler, if/elseif/else, switch, while/do-while/for/foreach.",
+    topics: [
+      {
+        name: "Operatörler", lang: "php", run: false,
+        note: "Aritmetik, karşılaştırma (== değer, === değer+tip), string birleştirme (.).",
+        blocks: [{ lang: "php", text:
+`<?php
+  $x = 10; $y = 3;
+  echo $x + $y;          // 13
+  echo "<br>" . $x % $y; // 1
+  var_dump($x == "10");  // bool(true)
+  var_dump($x === "10"); // bool(false)
+  echo "Ali" . " " . "Veli"; // string birleştirme
+?>` }],
+        output: "13\n1\nbool(true) bool(false)\nAli Veli"
+      },
+      {
+        name: "if / elseif / else", lang: "php", run: false,
+        note: "Sunucu saatine göre selam veren klasik örnek.",
+        blocks: [{ lang: "php", text:
+`<?php
+  $t = date("H");       // 0-23 saat
+  if ($t < "10") {
+    echo "Günaydın!";
+  } elseif ($t < "20") {
+    echo "İyi günler!";
+  } else {
+    echo "İyi geceler!";
+  }
+?>` }],
+        output: "(Saate göre) İyi günler!"
+      },
+      {
+        name: "switch", lang: "php", run: false,
+        note: "Bir değeri birden çok seçenekle karşılaştırır.",
+        blocks: [{ lang: "php", text:
+`<?php
+  $renk = "red";
+  switch ($renk) {
+    case "red":   echo "Favori renk kırmızı"; break;
+    case "blue":  echo "Favori renk mavi";    break;
+    default:      echo "Renk listede yok";
+  }
+?>` }],
+        output: "Favori renk kırmızı"
+      },
+      {
+        name: "Döngüler (while, for)", lang: "php", run: false,
+        note: "while koşul doğruyken, for belirli sayıda tekrar eder.",
+        blocks: [{ lang: "php", text:
+`<?php
+  $i = 1;
+  while ($i < 4) { echo $i; $i++; }   // 123
+  echo "<br>";
+  for ($x = 0; $x <= 3; $x++) {
+    if ($x == 2) continue;            // 2'yi atla
+    echo "Sayı: $x ";
+  }
+?>` }],
+        output: "123\nSayı: 0 Sayı: 1 Sayı: 3"
+      },
+      {
+        name: "foreach", lang: "php", run: false,
+        note: "Dizinin her elemanını gezer. İlişkisel dizide anahtar => değer.",
+        blocks: [{ lang: "php", text:
+`<?php
+  $renkler = array("red", "green", "blue");
+  foreach ($renkler as $deger) { echo "$deger "; }
+  echo "<br>";
+  $uyeler = array("Peter" => 35, "Ben" => 37);
+  foreach ($uyeler as $ad => $yas) { echo "$ad: $yas "; }
+?>` }],
+        output: "red green blue\nPeter: 35 Ben: 37"
+      }
+    ]
+  },
+
+  /* ============================ HAFTA 9 ============================ */
+  {
+    id: 9, title: "PHP — Fonksiyon, Dizi, Superglobals", langs: ["php"],
+    summary: "Fonksiyonlar, indeksli/ilişkisel/çok boyutlu diziler, dizi fonksiyonları, superglobals.",
+    topics: [
+      {
+        name: "Fonksiyonlar (varsayılan, return)", lang: "php", run: false,
+        note: "Parametre, varsayılan değer ve return.",
+        blocks: [{ lang: "php", text:
+`<?php
+  function sum($x, $y) {
+    return $x + $y;
+  }
+  function setHeight($h = 50) {
+    echo "Yükseklik: $h<br>";
+  }
+  echo "5 + 10 = " . sum(5, 10) . "<br>";
+  setHeight(350);
+  setHeight();        // varsayılan 50
+?>` }],
+        output: "5 + 10 = 15\nYükseklik: 350\nYükseklik: 50"
+      },
+      {
+        name: "Variadic fonksiyon (...)", lang: "php", run: false,
+        note: "... ile değişken sayıda argüman bir dizi olur.",
+        blocks: [{ lang: "php", text:
+`<?php
+  function topAll(...$x) {
+    $n = 0;
+    foreach ($x as $sayi) { $n += $sayi; }
+    return $n;
+  }
+  echo topAll(5, 2, 6, 2, 7, 7);   // 29
+?>` }],
+        output: "29"
+      },
+      {
+        name: "Diziler (indeksli, ilişkisel, çok boyutlu)", lang: "php", run: false,
+        note: "3 dizi türü. Çok boyutlu = dizilerin dizisi.",
+        blocks: [{ lang: "php", text:
+`<?php
+  $cars = array("Volvo", "BMW", "Toyota");   // indeksli
+  echo $cars[0] . "<br>";
+
+  $araba = array("marka" => "Ford", "yil" => 1964); // ilişkisel
+  echo $araba["marka"] . "<br>";
+
+  $matris = array(                              // çok boyutlu
+    array("Volvo", 22, 18),
+    array("BMW", 15, 13)
+  );
+  echo $matris[1][0] . ": stok " . $matris[1][1];
+?>` }],
+        output: "Volvo\nFord\nBMW: stok 15"
+      },
+      {
+        name: "Dizi fonksiyonları (ekle/sil)", lang: "php", run: false,
+        note: "array_push/unshift ekler, array_pop/shift/splice/unset siler, array_merge birleştirir.",
+        blocks: [{ lang: "php", text:
+`<?php
+  $f = array("Apple", "Banana");
+  array_push($f, "Cherry");     // sona ekle
+  array_unshift($f, "Kiwi");    // başa ekle
+  array_pop($f);                // sondan sil
+  print_r($f);
+  $birlesik = array_merge(["a","b"], ["c"]);
+  print_r($birlesik);
+?>` }],
+        output: "Array ( [0] => Kiwi [1] => Apple [2] => Banana )\nArray ( [0] => a [1] => b [2] => c )"
+      },
+      {
+        name: "Superglobals ($_GET, $_POST, $_SERVER)", lang: "php", run: false,
+        note: "Her kapsamdan erişilen önceden tanımlı diziler. Kullanıcı verisi htmlspecialchars ile güvenli hale getirilir.",
+        blocks: [{ lang: "php", text:
+`<?php
+  // welcome.php?ad=Ali  şeklinde gelirse:
+  $ad = htmlspecialchars($_GET["ad"] ?? "Misafir");
+  echo "Hoş geldin, $ad<br>";
+  echo "Sayfa: " . $_SERVER["PHP_SELF"];
+?>` }],
+        output: "Hoş geldin, Ali\nSayfa: /welcome.php"
+      }
+    ]
+  },
+
+  /* ============================ HAFTA 10 =========================== */
+  {
+    id: 10, title: "PHP — Form & Dosya İşlemleri", langs: ["php", "html"],
+    summary: "Formlar, GET/POST, doğrulama, include/require, dosya işleme ve yükleme.",
+    topics: [
+      {
+        name: "HTML form + PHP işleme", lang: "php", run: false,
+        note: "Form action ile PHP dosyasına gönderilir; veriler $_POST ile alınır.",
+        blocks: [
+          { lang: "html", text:
+`<!-- index.html -->
+<form action="welcome.php" method="post">
+  Ad: <input type="text" name="ad"><br>
+  E-posta: <input type="text" name="email"><br>
+  <input type="submit">
+</form>` },
+          { lang: "php", text:
+`<?php
+  // welcome.php
+  echo "Hoş geldin " . htmlspecialchars($_POST["ad"]) . "<br>";
+  echo "E-posta: " . htmlspecialchars($_POST["email"]);
+?>` }
+        ],
+        output: "Hoş geldin Ali\nE-posta: ali@ornek.com"
+      },
+      {
+        name: "Form doğrulama (validation)", lang: "php", run: false,
+        note: "test_input ile temizleme, preg_match ve filter_var ile doğrulama.",
+        blocks: [{ lang: "php", text:
+`<?php
+  function test_input($data) {
+    $data = trim($data);
+    $data = stripslashes($data);
+    $data = htmlspecialchars($data);  // XSS koruması
+    return $data;
+  }
+  $ad = test_input($_POST["ad"] ?? "");
+  if (!preg_match("/^[a-zA-Z-' ]*$/", $ad)) {
+    echo "Yalnızca harf ve boşluk!";
+  }
+  $email = $_POST["email"] ?? "";
+  if (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
+    echo "Geçersiz e-posta!";
+  }
+?>` }],
+        output: "(Geçersiz girişte) Yalnızca harf ve boşluk! / Geçersiz e-posta!"
+      },
+      {
+        name: "include / require", lang: "php", run: false,
+        note: "Ortak header/footer/menüyü tek dosyada tutup her sayfaya dahil etmek için kullanılır.",
+        blocks: [{ lang: "php", text:
+`<?php
+  // footer.php dosyasını sayfanın sonuna ekle
+?>
+<html><body>
+  <h1>Ana Sayfa</h1>
+  <p>İçerik...</p>
+  <?php include 'footer.php'; ?>
+</body></html>
+<?php
+  // require: dosya yoksa ölümcül hata verir, betik durur
+  // include: yoksa sadece uyarı verir, devam eder
+?>` }],
+        output: "Sayfa içeriği + footer.php içeriği birlikte görüntülenir."
+      },
+      {
+        name: "Dosya işleme (oku/yaz)", lang: "php", run: false,
+        note: "fopen/fwrite/fread/fclose ile dosya işlemleri; unlink siler.",
+        blocks: [{ lang: "php", text:
+`<?php
+  // Yazma
+  $f = fopen("not.txt", "w");
+  fwrite($f, "Merhaba dosya!");
+  fclose($f);
+
+  // Okuma
+  echo readfile("not.txt");   // dosya içeriğini ekrana basar
+?>` }],
+        output: "Merhaba dosya!"
+      },
+      {
+        name: "Dosya yükleme (upload)", lang: "php", run: false,
+        note: "Form enctype=multipart/form-data olmalı; sunucuda $_FILES ile işlenir.",
+        blocks: [
+          { lang: "html", text:
+`<form action="upload.php" method="post" enctype="multipart/form-data">
+  <input type="file" name="dosya">
+  <input type="submit" value="Yükle">
+</form>` },
+          { lang: "php", text:
+`<?php
+  // upload.php
+  $hedef = "uploads/" . basename($_FILES["dosya"]["name"]);
+  $tur = strtolower(pathinfo($hedef, PATHINFO_EXTENSION));
+  if (in_array($tur, ["jpg","jpeg","png","gif"])) {
+    move_uploaded_file($_FILES["dosya"]["tmp_name"], $hedef);
+    echo "Yüklendi: $hedef";
+  } else {
+    echo "Sadece resim yüklenebilir!";
+  }
+?>` }
+        ],
+        output: "Yüklendi: uploads/resim.jpg"
+      }
+    ]
+  },
+
+  /* ============================ HAFTA 11 =========================== */
+  {
+    id: 11, title: "PHP — Çerezler & Oturumlar", langs: ["php"],
+    summary: "setcookie / $_COOKIE, session_start / $_SESSION, login-logout mantığı.",
+    topics: [
+      {
+        name: "Çerez oluştur ve oku", lang: "php", run: false,
+        note: "setcookie() HTML çıktısından ÖNCE çağrılmalıdır. Çerez tarayıcıda saklanır.",
+        blocks: [{ lang: "php", text:
+`<?php
+  // 30 gün geçerli çerez (86400 = 1 gün)
+  setcookie("username", "John Doe", time() + 86400 * 30, "/");
+?>
+<html><body>
+<?php
+  if (isset($_COOKIE["username"])) {
+    echo "Kullanıcı: " . $_COOKIE["username"];
+  } else {
+    echo "Çerez henüz ayarlanmadı (sayfayı yenileyin).";
+  }
+?>
+</body></html>` }],
+        output: "Kullanıcı: John Doe"
+      },
+      {
+        name: "Çerez sil", lang: "php", run: false,
+        note: "Geçmiş bir tarih vererek çerez silinir.",
+        blocks: [{ lang: "php", text:
+`<?php
+  setcookie("username", "", time() - 3600, "/");  // geçmiş tarih
+  echo "Çerez silindi.";
+?>` }],
+        output: "Çerez silindi."
+      },
+      {
+        name: "Oturum başlat ve kullan", lang: "php", run: false,
+        note: "session_start() her betiğin başında çağrılır. Veriler sunucuda saklanır; PHPSESSID çerezi kimliği taşır.",
+        blocks: [{ lang: "php", text:
+`<?php
+  session_start();
+  $_SESSION["kullanici"] = "Ali";
+  $_SESSION["rol"] = "admin";
+  echo "Oturum açıldı: " . $_SESSION["kullanici"];
+  print_r($_SESSION);
+?>` }],
+        output: "Oturum açıldı: Ali\nArray ( [kullanici] => Ali [rol] => admin )"
+      },
+      {
+        name: "Oturum sonlandır (logout)", lang: "php", run: false,
+        note: "session_unset değişkenleri boşaltır, session_destroy oturumu yok eder.",
+        blocks: [{ lang: "php", text:
+`<?php
+  session_start();
+  session_unset();      // tüm oturum değişkenlerini boşalt
+  session_destroy();    // oturumu yok et
+  echo "Çıkış yapıldı.";
+?>` }],
+        output: "Çıkış yapıldı."
+      },
+      {
+        name: "Basit login kontrolü (session)", lang: "php", run: false,
+        note: "Korumalı sayfa: oturum yoksa login'e yönlendirir. (Hafta 10-11 ödevinin temeli.)",
+        blocks: [{ lang: "php", text:
+`<?php
+  session_start();
+  if (!isset($_SESSION["kullanici"])) {
+    header("Location: login.php");   // giriş yoksa yönlendir
+    exit;
+  }
+  echo "Hoş geldin, " . $_SESSION["kullanici"];
+  echo " | <a href='logout.php'>Çıkış</a>";
+?>` }],
+        output: "Hoş geldin, Ali | Çıkış"
+      }
+    ]
+  }
+  ]
+};
+
+  </script>
+  <script>
+/* =====================================================================
+   Araştırma ödevlerinden gelen, uygulamada başka hiçbir haftada
+   bulunmayan içerikler. İlgili haftalara eklenir.
+   Her biri research:true ile "ARAŞTIRMA ÖDEVİ" rozetiyle işaretlidir.
+===================================================================== */
+(function () {
+  function add(weekId, topics) {
+    var w = COURSE.weeks.filter(function (x) { return x.id === weekId; })[0];
+    if (w) w.topics = w.topics.concat(topics);
+  }
+
+  /* ---------------- HAFTA 1 ---------------- */
+  add(1, [
+    {
+      name: "GET ve POST farkı", lang: "html", run: true, research: true,
+      note: "Slayttaki araştırma konusu. İki form da aynı görünür ama veriyi farklı taşır.",
+      blocks: [{ lang: "html", text:
+`<form action="ara.php" method="get">
+  Ara: <input type="text" name="q"> <button>GET ile gönder</button>
+</form>
+<form action="kaydet.php" method="post">
+  Şifre: <input type="password" name="sifre"> <button>POST ile gönder</button>
+</form>` }],
+      list: [
+        { t: "GET", d: "Veriler URL'de (?q=...) görünür, yer imine eklenebilir, önbelleğe alınır, uzunluğu sınırlıdır. Arama gibi zararsız işlemler için." },
+        { t: "POST", d: "Veriler istek gövdesinde gizli gönderilir, boyut sınırı yoktur, önbelleğe alınmaz. Şifre, dosya yükleme, kayıt gibi işlemler için." }
+      ]
+    },
+    {
+      name: "Araştırma — Web ve sunucu terimleri", lang: "kavram", run: false, research: true,
+      note: "Hafta 1 terim sözlüğü ödevinden, uygulamada açıklanmayan temel terimler.",
+      list: [
+        { t: "Web / İnternet", d: "İnternet ağların ağıdır; Web bu ağ üzerinde HTTP ile erişilen sayfalar bütünüdür." },
+        { t: "Client / Server", d: "İstemci (tarayıcı) istek yapar, sunucu yanıt döndürür." },
+        { t: "HTTP / HTTPS", d: "Web'in iletişim protokolü; HTTPS, TLS ile şifrelenmiş güvenli sürümüdür." },
+        { t: "URL", d: "Kaynağın adresi: şema://alanadı/yol?sorgu." },
+        { t: "Domain (Alan adı)", d: "İnsana okunur site adı (ornek.com); IP'ye karşılık gelir." },
+        { t: "IP adresi", d: "Cihazların ağdaki sayısal adresi (ör. 127.0.0.1)." },
+        { t: "Hosting", d: "Site dosyalarının barındırıldığı sunucu hizmeti." },
+        { t: "Port", d: "Aynı IP'de servisleri ayıran numara (HTTP 80, HTTPS 443)." },
+        { t: "Document root", d: "Sitenin kök dizini (Laragon'da www, XAMPP'te htdocs)." },
+        { t: "php.ini", d: "PHP'nin davranışını belirleyen yapılandırma dosyası." },
+        { t: "Frontend / Backend", d: "Ön yüz (tarayıcı tarafı) / arka uç (sunucu tarafı)." }
+      ]
+    },
+    {
+      name: "Araştırma — Güvenlik, veritabanı ve API terimleri", lang: "kavram", run: false, research: true,
+      note: "Hafta 1 terim sözlüğü ödevinin ileri kısmı; bu terimler diğer haftalarda da geçmiyordu.",
+      list: [
+        { t: "JSON", d: "Veri değişimi için metin formatı (anahtar-değer)." },
+        { t: "AJAX / Fetch", d: "Sayfayı yenilemeden sunucuyla veri alışverişi yapma tekniği/API'si." },
+        { t: "API / REST", d: "Uygulamaların konuştuğu arayüz; REST, HTTP tabanlı yaygın bir API stilidir." },
+        { t: "XSS", d: "Sayfaya kötücül JavaScript enjeksiyonu; htmlspecialchars ile çıktı kaçışı önler." },
+        { t: "CSRF", d: "Kullanıcının oturumuyla istem dışı istek; token ile önlenir." },
+        { t: "SQL Injection", d: "Sorguya kötücül girdi sokma; hazır ifade (prepared statement) ile önlenir." },
+        { t: "Hash / Password hashing", d: "Geri döndürülemez özet; şifreler password_hash() ile saklanır." },
+        { t: "Validation / Sanitization", d: "Girdiyi doğrulama / temizleme." },
+        { t: "Database / Table / Record / Field", d: "Veritabanı / tablo / satır (kayıt) / sütun (alan)." },
+        { t: "Primary key / Foreign key", d: "Satırı benzersiz yapan birincil anahtar / tablolar arası ilişki kuran yabancı anahtar." },
+        { t: "SQL", d: "Veritabanı dili: SELECT (oku), INSERT (ekle), UPDATE (güncelle), DELETE (sil)." },
+        { t: "phpMyAdmin", d: "MySQL'i web arayüzünden yöneten araç." }
+      ]
+    }
+  ]);
+
+  /* ---------------- HAFTA 2 ---------------- */
+  add(2, [
+    {
+      name: "Araştırma — Ek HTML etiketleri", lang: "html", run: true, research: true,
+      note: "Slaytta araştırılması istenen etiketler: strong, i, del, ins, q, hr, meter, progress, footer, caption.",
+      blocks: [{ lang: "html", text:
+`<p>Bu <strong>kalın</strong>, bu <i>italik</i>,
+   bu <del>silinmiş</del> ve bu <ins>eklenmiş</ins> metin.</p>
+<q>Kısa bir alıntı.</q>
+<hr>
+<label>İlerleme: <progress value="70" max="100"></progress></label><br>
+<label>Doluluk: <meter value="0.6">%60</meter></label>
+<table border="1"><caption>Tablo başlığı (caption)</caption>
+  <tr><td>Hücre</td></tr></table>
+<footer>Sayfa altbilgisi (footer)</footer>` }],
+      list: [
+        { t: "<video>", d: "Slaytta ayrıca <video> geçer: <video src=\"film.mp4\" controls></video> ile video oynatıcı eklenir (bir medya dosyası gerektiği için burada gösterilmedi)." }
+      ]
+    },
+    {
+      name: "Araştırma — Web performansı", lang: "kavram", run: false, research: true,
+      note: "Hafta 2 terim ödevindeki performans/optimizasyon kavramları.",
+      list: [
+        { t: "CDN", d: "İçeriği kullanıcıya coğrafi olarak yakın sunuculardan dağıtan ağ." },
+        { t: "Core Web Vitals", d: "Google'ın kullanıcı deneyimi metrikleri kümesi." },
+        { t: "LCP", d: "Largest Contentful Paint — en büyük içeriğin görünme süresi." },
+        { t: "FID / INP", d: "Kullanıcının ilk etkileşimine verilen yanıt gecikmesi." },
+        { t: "CLS", d: "Cumulative Layout Shift — beklenmedik görsel kaymalar." },
+        { t: "PageSpeed Insights", d: "Sayfa hızını ölçen ve öneri veren Google aracı." },
+        { t: "LiteSpeed Cache", d: "LiteSpeed sunucusu için önbellekleme çözümü." },
+        { t: "SPA / SSR", d: "Tek sayfa uygulaması / sunucu tarafında render etme." },
+        { t: "WebP / AVIF", d: "Daha küçük boyutlu modern görsel formatları." },
+        { t: "Bounce rate", d: "Tek sayfa görüp siteden hemen ayrılma oranı." }
+      ]
+    }
+  ]);
+
+  /* ---------------- HAFTA 5 ---------------- */
+  add(5, [
+    {
+      name: "Araştırma — JS kütüphaneleri ve framework'ler", lang: "kavram", run: false, research: true,
+      note: "Slayttaki 'Kütüphaneleri ve framework'leri araştırınız' ödevi.",
+      list: [
+        { t: "jQuery", d: "DOM seçimi, olaylar ve AJAX'ı kısaltan klasik kütüphane." },
+        { t: "React", d: "Facebook'un bileşen tabanlı arayüz kütüphanesi." },
+        { t: "Angular", d: "Google'ın kapsamlı, TypeScript tabanlı framework'ü." },
+        { t: "Vue.js", d: "Hafif, öğrenmesi kolay, kademeli benimsenen framework." },
+        { t: "Backbone.js", d: "Minimal yapıda, eski bir MV* kütüphanesi." }
+      ]
+    },
+    {
+      name: "Araştırma — JS güvenliği ve motorları", lang: "kavram", run: false, research: true,
+      note: "Slayttaki 'JS güvenlik zafiyetleri, Gecko ve SpiderMonkey' ödevi.",
+      list: [
+        { t: "XSS (zafiyet)", d: "Sayfaya kötücül JS enjekte etme; en yaygın istemci tarafı açığıdır." },
+        { t: "Önlemler", d: "Çıktı kaçışı (escaping), girdi doğrulama/temizleme, CSP başlıkları, güvenilmeyen veriye innerHTML kullanmama." },
+        { t: "V8", d: "Chrome ve Node.js'in JavaScript motoru." },
+        { t: "SpiderMonkey", d: "Firefox'un JavaScript motoru; ilk JS motorudur (Brendan Eich)." },
+        { t: "Gecko", d: "Firefox'un sayfa düzenleme (layout/render) motoru." }
+      ]
+    }
+  ]);
+
+  /* ---------------- HAFTA 6 ---------------- */
+  add(6, [
+    {
+      name: "Araştırma — window nesnesi (BOM)", lang: "js", run: true, research: true,
+      note: "Tarayıcı Nesne Modeli. window; ekran, adres, geçmiş ve zamanlayıcılara erişim verir.",
+      blocks: [{ lang: "js", text:
+`console.log("Pencere:", window.innerWidth + " x " + window.innerHeight);
+console.log("Ekran:", screen.width + " x " + screen.height);
+console.log("Adres (URL):", location.href);
+console.log("Tarayıcı:", navigator.userAgent.slice(0, 45) + "...");
+console.log("Geçmiş adım sayısı:", history.length);
+setTimeout(function () { console.log("setTimeout: 1 sn sonra çalıştı"); }, 1000);
+window.alert("window.alert() de BOM'a aittir");` }]
+    },
+    {
+      name: "Araştırma — document koleksiyonları", lang: "js", run: true, research: true,
+      note: "document üzerinden sayfadaki bağlantı, resim, form gibi öğe gruplarına erişilir.",
+      blocks: [
+        { lang: "html", text:
+`<a href="#">Bağlantı 1</a> <a href="#">Bağlantı 2</a>
+<img src="data:," alt="resim">
+<form></form>` },
+        { lang: "js", text:
+`document.title = "Demo";
+console.log("Başlık:", document.title);
+console.log("Bağlantı sayısı:", document.links.length);
+console.log("Resim sayısı:", document.images.length);
+console.log("Form sayısı:", document.forms.length);
+console.log("Kök eleman:", document.documentElement.tagName);
+console.log("body etiketi:", document.body.tagName);` }
+      ]
+    },
+    {
+      name: "Araştırma — Tarihler (Date)", lang: "js", run: true, research: true,
+      note: "Aylar 0'dan başlar (0 = Ocak). getDay() haftanın gününü (0 = Pazar) verir.",
+      blocks: [{ lang: "js", text:
+`const d = new Date(2025, 0, 15, 10, 30);  // 15 Ocak 2025, 10:30
+console.log("Yıl/Ay/Gün:", d.getFullYear(), d.getMonth() + 1, d.getDate());
+console.log("Saat:", d.getHours() + ":" + d.getMinutes());
+console.log("Haftanın günü (0=Pazar):", d.getDay());
+const simdi = new Date();
+console.log("Şimdi (ISO):", simdi.toISOString());` }]
+    },
+    {
+      name: "Araştırma — Set ve Map", lang: "js", run: true, research: true,
+      note: "Set benzersiz değerler tutar; Map anahtar-değer çiftlerini (her tür anahtarla) tutar.",
+      blocks: [{ lang: "js", text:
+`const s = new Set([1, 2, 2, 3, 3, 3]);
+s.add(4);
+console.log("Set:", [...s], "| boyut:", s.size, "| has(2):", s.has(2));
+
+const m = new Map();
+m.set("ad", "Ali");
+m.set("yas", 21);
+console.log("Map ad:", m.get("ad"), "| boyut:", m.size);
+m.forEach(function (deger, anahtar) { console.log(anahtar + " => " + deger); });` }]
+    },
+    {
+      name: "Araştırma — Math nesnesi (JS)", lang: "js", run: true, research: true,
+      note: "Matematik işlemleri için yerleşik nesne; new ile oluşturulmaz, doğrudan kullanılır.",
+      blocks: [{ lang: "js", text:
+`console.log("PI:", Math.PI);
+console.log("round/ceil/floor(4.6):", Math.round(4.6), Math.ceil(4.2), Math.floor(4.8));
+console.log("sqrt(16):", Math.sqrt(16), "| pow(2,10):", Math.pow(2, 10));
+console.log("max/min:", Math.max(3, 9, 1), Math.min(3, 9, 1));
+console.log("abs(-7):", Math.abs(-7));
+console.log("random (0-1):", Math.random().toFixed(3));` }]
+    }
+  ]);
+
+  /* ---------------- HAFTA 7 ---------------- */
+  add(7, [
+    {
+      name: "Araştırma — Math fonksiyonları (PHP)", lang: "php", run: false, research: true,
+      note: "Slayttaki PHP matematik fonksiyonları ödevi. Sunucuda çalışır.",
+      blocks: [{ lang: "php", text:
+`<?php
+  echo "abs(-7) = " . abs(-7) . "<br>";
+  echo "ceil(4.2) = " . ceil(4.2) . ", floor(4.8) = " . floor(4.8) . "<br>";
+  echo "round(4.567, 2) = " . round(4.567, 2) . "<br>";
+  echo "sqrt(144) = " . sqrt(144) . ", pow(2,10) = " . pow(2, 10) . "<br>";
+  echo "max = " . max(3, 9, 1) . ", min = " . min(3, 9, 1) . "<br>";
+  echo "pi() = " . pi() . "<br>";
+  echo "rand(1,100) = " . rand(1, 100) . "<br>";
+  var_dump(is_nan(NAN));
+  var_dump(is_infinite(INF));
+?>` }],
+      output:
+`abs(-7) = 7
+ceil(4.2) = 5, floor(4.8) = 4
+round(4.567, 2) = 4.57
+sqrt(144) = 12, pow(2,10) = 1024
+max = 9, min = 1
+pi() = 3.1415926535898
+rand(1,100) = 42
+bool(true)
+bool(true)`
+    },
+    {
+      name: "Araştırma — Ek string/hash fonksiyonları (PHP)", lang: "php", run: false, research: true,
+      note: "Slayttaki ek metin ve özet (hash) fonksiyonları ödevi.",
+      blocks: [{ lang: "php", text:
+`<?php
+  echo implode("-", ["a", "b", "c"]) . "<br>";          // a-b-c
+  echo ucfirst("merhaba") . " | " . ucwords("merhaba dünya") . "<br>";
+  echo lcfirst("Merhaba") . "<br>";                       // merhaba
+  print_r(str_split("ABC"));                              // [A,B,C]
+  echo "<br>kelime sayısı: " . str_word_count("php çok güzel") . "<br>";
+  var_dump(str_starts_with("merhaba", "mer"));            // true
+  var_dump(str_ends_with("merhaba", "ba"));               // true
+  echo "strcmp(a,b) = " . strcmp("a", "b") . "<br>";      // -1
+  echo "md5(123) = " . md5("123");
+?>` }],
+      output:
+`a-b-c
+Merhaba | Merhaba Dünya
+merhaba
+Array ( [0] => A [1] => B [2] => C )
+kelime sayısı: 3
+bool(true)
+bool(true)
+strcmp(a,b) = -1
+md5(123) = 202cb962ac59075b964b07152d234b70`
+    }
+  ]);
+
+  /* ---------------- HAFTA 9 ---------------- */
+  add(9, [
+    {
+      name: "Araştırma — Ek dizi fonksiyonları (PHP)", lang: "php", run: false, research: true,
+      note: "Slayttaki 'Dizi Fonksiyonları' araştırma ödevinden örnekler.",
+      blocks: [{ lang: "php", text:
+`<?php
+  $a = [3, 1, 4, 1, 5];
+  echo "array_sum: " . array_sum($a) . "<br>";              // 14
+  print_r(array_reverse($a)); echo "<br>";                   // [5,1,4,1,3]
+  print_r(array_keys(["a" => 1, "b" => 2])); echo "<br>";    // [a,b]
+  echo "array_search(4): " . array_search(4, $a) . "<br>";   // 2
+  var_dump(array_key_exists(0, $a));                          // true
+  print_r(array_map(fn($x) => $x * 2, [1, 2, 3])); echo "<br>"; // [2,4,6]
+  print_r(array_count_values(["x", "y", "x"])); echo "<br>"; // x=>2, y=>1
+  print_r(array_combine(["ad", "yas"], ["Ali", 21]));        // ad=>Ali, yas=>21
+?>` }],
+      output:
+`array_sum: 14
+Array ( [0] => 5 [1] => 1 [2] => 4 [3] => 1 [4] => 3 )
+Array ( [0] => a [1] => b )
+array_search(4): 2
+bool(true)
+Array ( [0] => 2 [1] => 4 [2] => 6 )
+Array ( [x] => 2 [y] => 1 )
+Array ( [ad] => Ali [yas] => 21 )`
+    }
+  ]);
+
+  /* ---------------- HAFTA 10 ---------------- */
+  add(10, [
+    {
+      name: "Araştırma — Dosya okuma fonksiyonları (PHP)", lang: "php", run: false, research: true,
+      note: "Slayttaki dosya fonksiyonları ödevi: fopen, fgets, fgetc, feof, fread, fclose, unlink.",
+      blocks: [{ lang: "php", text:
+`<?php
+  // Önce örnek dosya oluştur
+  $f = fopen("ornek.txt", "w");
+  fwrite($f, "satir1\nsatir2\nsatir3");
+  fclose($f);
+
+  // Satır satır oku (dosya sonuna kadar)
+  $f = fopen("ornek.txt", "r");
+  while (!feof($f)) {
+    echo fgets($f) . "<br>";   // tek satır oku
+  }
+  fclose($f);
+
+  // Tek karakter oku
+  $f = fopen("ornek.txt", "r");
+  echo "İlk karakter: " . fgetc($f);
+  fclose($f);
+
+  unlink("ornek.txt");          // dosyayı sil
+?>` }],
+      output:
+`satir1
+satir2
+satir3
+İlk karakter: s`
+    },
+    {
+      name: "Araştırma/Uygulama — MySQL ile CRUD (PHP)", lang: "php", run: false, research: true,
+      note: "Hafta 10-11 kütüphane otomasyonu ödevinin veritabanı temeli (mysqli). Login/oturum kısmı Hafta 11'de.",
+      blocks: [{ lang: "php", text:
+`<?php
+  // Bağlantı
+  $db = new mysqli("localhost", "root", "", "kutuphane");
+  if ($db->connect_error) die("Bağlantı hatası");
+
+  // INSERT — kitap ekle
+  $db->query("INSERT INTO kitaplar (ad, yazar) VALUES ('Sefiller', 'V. Hugo')");
+
+  // SELECT — listele
+  $sonuc = $db->query("SELECT id, ad FROM kitaplar");
+  while ($row = $sonuc->fetch_assoc()) {
+    echo $row["id"] . " - " . $row["ad"] . "<br>";
+  }
+
+  // UPDATE — güncelle
+  $db->query("UPDATE kitaplar SET yazar = 'Victor Hugo' WHERE id = 1");
+
+  // DELETE — sil
+  $db->query("DELETE FROM kitaplar WHERE id = 5");
+
+  $db->close();
+?>` }],
+      output:
+`(kutuphane veritabanı ve kitaplar tablosu hazırsa)
+1 - Sefiller
+2 - Tutunamayanlar
+...`
+    }
+  ]);
+
+  /* ---------- Final sınavı için eklenenler ---------- */
+
+  /* HAFTA 4 — CSS dosyaları ve kütüphaneler (Bootstrap) */
+  add(4, [
+    {
+      name: "CSS dosyaları ve kütüphaneler (Bootstrap)", lang: "css", run: true,
+      note: "Stili ayrı bir dosyada tutmak (harici CSS) ve Bootstrap gibi hazır kütüphaneleri kullanmak. Not: Bu örnek Bootstrap'i CDN'den yükler, stillerin görünmesi için internet gerekir.",
+      blocks: [{ lang: "html", text:
+`<!DOCTYPE html>
+<html lang="tr">
+<head>
+  <meta charset="UTF-8">
+  <!-- 1) Kendi harici CSS dosyan:
+       <link rel="stylesheet" href="style.css"> -->
+
+  <!-- 2) Bootstrap kütüphanesi (CDN ile) -->
+  <link rel="stylesheet"
+    href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css">
+</head>
+<body class="p-3">
+  <h4>Bootstrap hazır sınıfları</h4>
+  <button class="btn btn-primary">Birincil buton</button>
+  <button class="btn btn-success">Başarılı</button>
+
+  <div class="alert alert-warning mt-3">Bu bir Bootstrap uyarı kutusudur.</div>
+
+  <div class="row mt-2">
+    <div class="col bg-light border p-2">col</div>
+    <div class="col bg-light border p-2">col</div>
+    <div class="col bg-light border p-2">col</div>
+  </div>
+</body>
+</html>` }],
+      list: [
+        { t: "Harici CSS dosyası", d: "Stili ayrı bir .css dosyasında tutup <head> içine <link rel=\"stylesheet\" href=\"style.css\"> ile bağlarsın. Önerilen yöntemdir; aynı stil birçok sayfada kullanılır." },
+        { t: "Bootstrap", d: "En yaygın CSS kütüphanesi. Hazır buton, form, uyarı ve grid (row/col) sınıfları sunar. CDN linkiyle veya indirip <link> ile eklenir." },
+        { t: "Tailwind CSS", d: "Utility-first yaklaşım; küçük yardımcı sınıfları (p-3, flex, text-center...) birleştirerek tasarlarsın." },
+        { t: "Bulma / Foundation", d: "Diğer popüler hazır CSS framework'leri." }
+      ]
+    }
+  ]);
+
+  /* HAFTA 9 — $_REQUEST süperglobali */
+  add(9, [
+    {
+      name: "$_REQUEST süperglobali", lang: "php", run: false,
+      note: "$_REQUEST hem GET hem POST (ve çerez) verisini tek dizide toplar. Kaynağı ayırmadığı için güvenlik açısından $_GET/$_POST tercih edilir.",
+      blocks: [{ lang: "php", text:
+`<?php
+  // form.html?ad=Ali (GET) ya da POST ile gelsin, ikisini de okur:
+  $ad = htmlspecialchars($_REQUEST["ad"] ?? "Misafir");
+  echo "Hoş geldin, $ad<br>";
+
+  // Verinin nereden geldiğini ayırmak istersen:
+  if ($_SERVER["REQUEST_METHOD"] === "POST") {
+    echo "POST ile gönderildi.";
+  } else {
+    echo "GET ile gönderildi.";
+  }
+  // $_GET   -> yalnızca URL'deki veriler
+  // $_POST  -> yalnızca form gövdesindeki veriler
+  // $_REQUEST -> ikisi (ve çerez) birlikte
+?>` }],
+      output:
+`Hoş geldin, Ali
+GET ile gönderildi.`
+    }
+  ]);
+})();
+
+  </script>
+  <script>
+/* Web Programlama — Kod Atölyesi : uygulama mantığı */
+(function () {
+  "use strict";
+
+  var LANG_LABEL = { html: "HTML", css: "CSS", js: "JavaScript", php: "PHP", kavram: "Kavram" };
+
+  var state = { week: COURSE.weeks[0].id, query: "", lang: "all", about: true };
+  var runners = {}; // rid -> console panel element
+
+  var $sidebar = document.getElementById("sidebar");
+  var $main = document.getElementById("main");
+  var $search = document.getElementById("search");
+  var $chips = document.getElementById("chips");
+
+  /* ---------- sidebar ---------- */
+  function buildSidebar() {
+    var html = '<button class="side-item side-about" data-about="1">' +
+      '<span class="side-num">ⓘ</span>' +
+      '<span class="side-text"><span class="side-name">Ekler ve Hakkında</span></span></button>';
+    html += '<div class="side-sep"></div>';
+    html += '<div class="side-title">Haftalar</div>';
+    COURSE.weeks.forEach(function (w) {
+      var dot = w.langs.map(function (l) {
+        return '<i class="dot lang-' + l + '" title="' + (LANG_LABEL[l] || l) + '"></i>';
+      }).join("");
+      html += '<button class="side-item" data-week="' + w.id + '">' +
+        '<span class="side-num">' + w.id + '</span>' +
+        '<span class="side-text"><span class="side-name">' + w.title +
+        (w.added ? '<span class="badge-added">EKLENDİ</span>' : "") + "</span>" +
+        '<span class="side-dots">' + dot + "</span></span></button>";
+    });
+    $sidebar.innerHTML = html;
+    $sidebar.querySelectorAll(".side-item").forEach(function (b) {
+      b.addEventListener("click", function () {
+        if (b.dataset.about) {
+          state.about = true;
+        } else {
+          state.week = parseInt(b.dataset.week, 10);
+          state.about = false;
+        }
+        state.query = ""; $search.value = "";
+        render();
+      });
+    });
+  }
+
+  /* ---------- helpers ---------- */
+  function esc(s) { return s.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;"); }
+
+  function topicMatches(t) {
+    if (state.lang !== "all") {
+      var langs = (t.blocks || []).map(function (b) { return b.lang; });
+      langs.push(t.lang);
+      if (langs.indexOf(state.lang) === -1) return false;
+    }
+    if (state.query) {
+      var q = state.query.toLowerCase();
+      var hay = (t.name + " " + (t.note || "") + " " +
+        (t.blocks || []).map(function (b) { return b.text; }).join(" ") + " " +
+        (t.list || []).map(function (i) { return i.t + " " + i.d; }).join(" ")).toLowerCase();
+      if (hay.indexOf(q) === -1) return false;
+    }
+    return true;
+  }
+
+  var BASE_STYLE =
+    "body{font-family:-apple-system,Segoe UI,Roboto,Arial,sans-serif;font-size:14px;color:#1f2430;" +
+    "margin:0;padding:14px;line-height:1.5;}*{box-sizing:border-box;}";
+
+  function shim(rid) {
+    return "(function(){var R=" + JSON.stringify(rid) + ";" +
+      "function f(a){try{return typeof a==='object'?JSON.stringify(a):String(a);}catch(e){return String(a);}}" +
+      "function s(k,args){parent.postMessage({__run:1,rid:R,kind:k,text:[].map.call(args,f).join(' ')},'*');}" +
+      "['log','info','warn','error'].forEach(function(k){var o=console[k];console[k]=function(){o&&o.apply(console,arguments);s(k,arguments);};});" +
+      "window.alert=function(m){s('alert',[m]);};" +
+      "window.addEventListener('error',function(e){s('error',[e.message]);});" +
+      "})();";
+  }
+
+  function isStructured(htmlText) { return /<head|<html|<!doctype/i.test(htmlText); }
+
+  // Düzenleme/önizleme için temiz kaynak (shim'siz)
+  function cleanSource(t) {
+    var html = (t.blocks || []).filter(function (b) { return b.lang === "html"; }).map(function (b) { return b.text; }).join("\n");
+    var css = (t.blocks || []).filter(function (b) { return b.lang === "css"; }).map(function (b) { return b.text; }).join("\n\n");
+    var js = (t.blocks || []).filter(function (b) { return b.lang === "js"; }).map(function (b) { return b.text; }).join("\n\n");
+    if (isStructured(html) && !css && !js) return html;
+    var doc = '<!DOCTYPE html>\n<html lang="tr">\n<head>\n<meta charset="UTF-8">\n';
+    if (css) doc += "<style>\n" + css + "\n</style>\n";
+    doc += "</head>\n<body>\n";
+    doc += html || (js ? '<p id="demo"></p>' : "");
+    if (js) doc += "\n<script>\n" + js + "\n<\/script>";
+    doc += "\n</body>\n</html>";
+    return doc;
+  }
+
+  // Çalıştırılacak belge (shim + base style enjekte edilmiş)
+  function runnableDoc(source, rid) {
+    var doc = source;
+    var styleTag = "<style>" + BASE_STYLE + "</style>";
+    var scriptTag = "<script>" + shim(rid) + "<\/script>";
+    if (/<\/head>/i.test(doc)) doc = doc.replace(/<\/head>/i, styleTag + "</head>");
+    else doc = styleTag + doc;
+    if (/<\/body>/i.test(doc)) doc = doc.replace(/<\/body>/i, scriptTag + "</body>");
+    else doc = doc + scriptTag;
+    return doc;
+  }
+
+  /* ---------- topic card ---------- */
+  function topicCard(t) {
+    var rid = "r" + Math.random().toString(36).slice(2, 9);
+    var card = document.createElement("section");
+    card.className = "card";
+
+    // header
+    var head = document.createElement("div");
+    head.className = "card-head";
+    head.innerHTML =
+      '<h3 class="card-name">' + esc(t.name) +
+      (t.research ? '<span class="badge-research">ARAŞTIRMA ÖDEVİ</span>' : "") + "</h3>" +
+      '<span class="lang-badge lang-' + t.lang + '">' + (LANG_LABEL[t.lang] || t.lang) + "</span>";
+    card.appendChild(head);
+
+    if (t.note) {
+      var note = document.createElement("p");
+      note.className = "card-note";
+      note.textContent = t.note;
+      card.appendChild(note);
+    }
+
+    // code blocks
+    (t.blocks || []).forEach(function (b) {
+      var wrap = document.createElement("div");
+      wrap.className = "code-wrap";
+      var tag = document.createElement("span");
+      tag.className = "code-lang lang-" + b.lang;
+      tag.textContent = LANG_LABEL[b.lang] || b.lang;
+      var copy = document.createElement("button");
+      copy.className = "code-copy"; copy.textContent = "kopyala";
+      copy.addEventListener("click", function () { copyText(b.text, copy); });
+      var pre = document.createElement("pre");
+      pre.className = "code";
+      pre.innerHTML = "<code>" + HL(b.text, b.lang) + "</code>";
+      wrap.appendChild(tag); wrap.appendChild(copy); wrap.appendChild(pre);
+      card.appendChild(wrap);
+    });
+
+    // terim listesi (kavram kartları)
+    if (t.list && t.list.length) {
+      var dl = document.createElement("dl");
+      dl.className = "term-list";
+      t.list.forEach(function (item) {
+        var dt = document.createElement("dt"); dt.textContent = item.t;
+        var dd = document.createElement("dd"); dd.textContent = item.d;
+        dl.appendChild(dt); dl.appendChild(dd);
+      });
+      card.appendChild(dl);
+    }
+
+    // actions + output
+    var actions = document.createElement("div");
+    actions.className = "card-actions";
+    card.appendChild(actions);
+
+    var stage = document.createElement("div");
+    stage.className = "stage";
+    card.appendChild(stage);
+
+    if (t.run) {
+      var runBtn = button("▶ Çalıştır", "btn-run");
+      var editBtn = button("✎ Düzenle", "btn-ghost");
+      actions.appendChild(runBtn); actions.appendChild(editBtn);
+
+      runBtn.addEventListener("click", function () { runInto(stage, cleanSource(t), rid); });
+      editBtn.addEventListener("click", function () { openEditor(stage, t, rid); });
+    } else {
+      var serverNote = document.createElement("span");
+      serverNote.className = "server-note";
+      serverNote.textContent = t.lang === "php" ? "PHP — çalıştırmak için sunucu gerekir (Laragon/XAMPP)" : "";
+      if (serverNote.textContent) actions.appendChild(serverNote);
+      if (t.output) {
+        var out = document.createElement("div");
+        out.className = "expected";
+        out.innerHTML = '<div class="expected-label">Beklenen çıktı</div><pre>' + esc(t.output) + "</pre>";
+        stage.appendChild(out);
+      }
+    }
+    return card;
+  }
+
+  function button(label, cls) {
+    var b = document.createElement("button");
+    b.className = "btn " + cls; b.textContent = label; return b;
+  }
+
+  function runInto(stage, source, rid) {
+    stage.innerHTML = "";
+    var bar = document.createElement("div");
+    bar.className = "preview-bar"; bar.textContent = "Çıktı";
+    var frame = document.createElement("iframe");
+    frame.className = "preview";
+    frame.setAttribute("sandbox", "allow-scripts");
+    frame.setAttribute("title", "önizleme");
+    var cons = document.createElement("div");
+    cons.className = "console"; cons.style.display = "none";
+    runners[rid] = cons;
+    stage.appendChild(bar); stage.appendChild(frame); stage.appendChild(cons);
+    frame.srcdoc = runnableDoc(source, rid);
+  }
+
+  function openEditor(stage, t, rid) {
+    stage.innerHTML = "";
+    var ta = document.createElement("textarea");
+    ta.className = "editor"; ta.value = cleanSource(t);
+    ta.rows = Math.min(20, ta.value.split("\n").length + 1);
+    var run = button("▶ Çalıştır", "btn-run");
+    var result = document.createElement("div");
+    result.className = "stage-inner";
+    stage.appendChild(ta);
+    var row = document.createElement("div"); row.className = "editor-row";
+    row.appendChild(run); stage.appendChild(row);
+    stage.appendChild(result);
+    run.addEventListener("click", function () { runInto(result, ta.value, rid); });
+    runInto(result, ta.value, rid);
+  }
+
+  function copyText(text, btn) {
+    var done = function () { var o = btn.textContent; btn.textContent = "kopyalandı ✓"; setTimeout(function () { btn.textContent = o; }, 1200); };
+    if (navigator.clipboard && navigator.clipboard.writeText) {
+      navigator.clipboard.writeText(text).then(done, function () { fallback(text, done); });
+    } else fallback(text, done);
+  }
+  function fallback(text, done) {
+    var ta = document.createElement("textarea"); ta.value = text;
+    ta.style.position = "fixed"; ta.style.opacity = "0"; document.body.appendChild(ta);
+    ta.select(); try { document.execCommand("copy"); } catch (e) {}
+    document.body.removeChild(ta); done();
+  }
+
+  /* ---------- console messages ---------- */
+  window.addEventListener("message", function (e) {
+    var d = e.data;
+    if (!d || !d.__run || !runners[d.rid]) return;
+    var cons = runners[d.rid];
+    cons.style.display = "block";
+    var line = document.createElement("div");
+    line.className = "c-line c-" + d.kind;
+    line.textContent = (d.kind === "alert" ? "⚠ " : d.kind === "error" ? "✖ " : "› ") + d.text;
+    cons.appendChild(line);
+  });
+
+  /* ---------- render ---------- */
+  function render() {
+    var filtering = state.query || state.lang !== "all";
+    // chips active
+    $chips.querySelectorAll(".chip").forEach(function (c) {
+      c.classList.toggle("active", c.dataset.lang === state.lang);
+    });
+    $sidebar.querySelectorAll(".side-item").forEach(function (b) {
+      var act;
+      if (b.dataset.about) act = !filtering && state.about;
+      else act = !filtering && !state.about && parseInt(b.dataset.week, 10) === state.week;
+      b.classList.toggle("active", act);
+    });
+
+    $main.innerHTML = "";
+
+    if (filtering) {
+      var results = [];
+      COURSE.weeks.forEach(function (w) {
+        (w.topics || []).forEach(function (t) { if (topicMatches(t)) results.push({ w: w, t: t }); });
+      });
+      var h = document.createElement("div");
+      h.className = "week-head-block";
+      h.innerHTML = "<h2>Sonuçlar</h2><p class='week-sum'>" + results.length +
+        " konu bulundu" + (state.query ? ' · "' + esc(state.query) + '"' : "") +
+        (state.lang !== "all" ? " · " + LANG_LABEL[state.lang] : "") + "</p>";
+      $main.appendChild(h);
+      if (!results.length) {
+        var none = document.createElement("p"); none.className = "empty";
+        none.textContent = "Eşleşen konu yok. Aramayı veya filtreyi değiştir.";
+        $main.appendChild(none);
+      }
+      results.forEach(function (r) {
+        var tag = document.createElement("div"); tag.className = "result-week";
+        tag.textContent = "Hafta " + r.w.id + " — " + r.w.title;
+        $main.appendChild(tag);
+        $main.appendChild(topicCard(r.t));
+      });
+    } else if (state.about) {
+      renderAbout();
+    } else {
+      var w = COURSE.weeks.filter(function (x) { return x.id === state.week; })[0];
+      var head = document.createElement("div");
+      head.className = "week-head-block" + (w.added ? " added" : "");
+      head.innerHTML =
+        '<div class="week-eyebrow">Hafta ' + w.id + (w.added ? '<span class="badge-added">EKLENDİ</span>' : "") + "</div>" +
+        "<h2>" + esc(w.title) + "</h2>" +
+        '<p class="week-sum">' + esc(w.summary || "") + "</p>" +
+        '<p class="disclaimer">Lütfen yanlış, eksik ve fazla bilgiler olabileceğini unutmayınız.</p>';
+      $main.appendChild(head);
+      if (w.added) {
+        var nb = document.createElement("div");
+        nb.className = "note-banner";
+        nb.textContent = "Bu hafta orijinal ders dosyalarında eksikti. Ders planındaki CSS konusuna göre eklenmiştir.";
+        $main.appendChild(nb);
+      }
+      (w.topics || []).forEach(function (t) { $main.appendChild(topicCard(t)); });
+    }
+    $main.scrollTop = 0;
+  }
+
+  /* ---------- ekler & hakkında ---------- */
+  function renderAbout() {
+    var topics = 0, blocks = 0, runnable = 0, research = 0;
+    COURSE.weeks.forEach(function (w) {
+      (w.topics || []).forEach(function (t) {
+        topics++; if (t.run) runnable++; if (t.research) research++;
+        (t.blocks || []).forEach(function () { blocks++; });
+      });
+    });
+
+    var head = document.createElement("div");
+    head.className = "week-head-block";
+    head.innerHTML =
+      '<div class="week-eyebrow">Hakkında</div>' +
+      "<h2>Ekler ve Hakkında</h2>" +
+      '<p class="week-sum">Bu uygulamanın hazırlanışı, içeriği ve kullanımı hakkında bilgiler.</p>';
+    $main.appendChild(head);
+
+    var about = document.createElement("section");
+    about.className = "card about-card";
+    about.innerHTML =
+      '<h3 class="card-name">Hakkında</h3>' +
+      '<p class="about-credit">Sayın DOÇ. DR. Şaban GÜLCÜ Hoca\'nın öğrencilerle paylaştığı bir kısım notlar kullanılarak, Öğrenci Bilgehan Çağrı IŞIKLI tarafından hazırlanmıştır.</p>';
+    $main.appendChild(about);
+
+    var sum = document.createElement("section");
+    sum.className = "card";
+    sum.innerHTML =
+      '<h3 class="card-name">Ekler — İçerik özeti</h3>' +
+      '<dl class="term-list">' +
+      "<dt>Kapsam</dt><dd>" + COURSE.weeks.length + " hafta · " + topics + " konu · " + blocks + " kod bloğu.</dd>" +
+      "<dt>Çalıştırılabilir örnekler</dt><dd>" + runnable + " adet HTML/CSS/JavaScript örneği tarayıcıda canlı çalışır.</dd>" +
+      "<dt>Araştırma ödevi konuları</dt><dd>" + research + " konu, slaytlardaki araştırma ödevlerinden eklenip \"ARAŞTIRMA ÖDEVİ\" rozetiyle işaretlendi.</dd>" +
+      "<dt>Diller</dt><dd>HTML, CSS, JavaScript (tarayıcıda canlı); PHP (kod + beklenen çıktı, ayrıca sunucuda çalışan dosyalar).</dd>" +
+      "</dl>";
+    $main.appendChild(sum);
+
+    var how = document.createElement("section");
+    how.className = "card";
+    how.innerHTML =
+      '<h3 class="card-name">Ekler — Nasıl kullanılır</h3>' +
+      '<dl class="term-list">' +
+      "<dt>Tarayıcı bölümü</dt><dd>HTML/CSS/JS örneklerinde <b>▶ Çalıştır</b> ile kodu canlı görürsün; <b>✎ Düzenle</b> ile değiştirip yeniden çalıştırırsın. İnternet gerekmez.</dd>" +
+      "<dt>Tema ve tam ekran</dt><dd>Üst çubuktaki düğmelerle koyu/açık temaya geçebilir ve uygulamayı tam ekran yapabilirsin.</dd>" +
+      "</dl>";
+    $main.appendChild(how);
+
+    var added = document.createElement("section");
+    added.className = "card";
+    added.innerHTML =
+      '<h3 class="card-name">Ekler — Sonradan eklenen içerikler</h3>' +
+      '<dl class="term-list">' +
+      "<dt>CSS — Hafta 3 ve 4</dt><dd>Orijinal ders dosyalarında eksikti; ders planına göre eklendi ve <b>EKLENDİ</b> rozetiyle işaretlendi.</dd>" +
+      "<dt>Araştırma ödevi konuları</dt><dd>Slaytlardaki araştırma ödevlerinden derste işlenmeyen konular eklendi (BOM, Date/Set/Map, PHP Math/dizi/dosya fonksiyonları, terim sözlükleri vb.).</dd>" +
+      "</dl>" +
+      '<p class="disclaimer">Lütfen yanlış, eksik ve fazla bilgiler olabileceğini unutmayınız.</p>';
+    $main.appendChild(added);
+
+    $main.scrollTop = 0;
+  }
+
+  /* ---------- chips & search ---------- */
+  function buildChips() {
+    var langs = [["all", "Tümü"], ["html", "HTML"], ["css", "CSS"], ["js", "JavaScript"], ["php", "PHP"]];
+    $chips.innerHTML = langs.map(function (l) {
+      return '<button class="chip lang-pill-' + l[0] + '" data-lang="' + l[0] + '">' + l[1] + "</button>";
+    }).join("");
+    $chips.querySelectorAll(".chip").forEach(function (c) {
+      c.addEventListener("click", function () { state.lang = c.dataset.lang; render(); });
+    });
+  }
+  var t;
+  $search.addEventListener("input", function () {
+    clearTimeout(t);
+    t = setTimeout(function () { state.query = $search.value.trim(); render(); }, 120);
+  });
+
+  /* ---------- init ---------- */
+  document.getElementById("app-title").textContent = COURSE.meta.title;
+  document.getElementById("app-sub").textContent = COURSE.meta.subtitle;
+  buildSidebar();
+  buildChips();
+  render();
+
+  /* tema geçişi */
+  var $theme = document.getElementById("theme-toggle");
+  function refreshThemeIcon() {
+    var dark = document.documentElement.getAttribute("data-theme") === "dark";
+    $theme.textContent = dark ? "☀" : "☾";
+    $theme.title = dark ? "Açık moda geç" : "Koyu moda geç";
+  }
+  refreshThemeIcon();
+  $theme.addEventListener("click", function () {
+    var dark = document.documentElement.getAttribute("data-theme") === "dark";
+    var next = dark ? "light" : "dark";
+    document.documentElement.setAttribute("data-theme", next);
+    try { localStorage.setItem("wp-theme", next); } catch (e) {}
+    refreshThemeIcon();
+  });
+
+  /* tam ekran */
+  var $fs = document.getElementById("fs-toggle");
+  function fsElement() { return document.fullscreenElement || document.webkitFullscreenElement; }
+  function refreshFsIcon() {
+    var on = !!fsElement();
+    $fs.textContent = on ? "✕" : "⛶";
+    $fs.title = on ? "Tam ekrandan çık" : "Tam ekran";
+  }
+  $fs.addEventListener("click", function () {
+    try {
+      if (!fsElement()) {
+        var el = document.documentElement;
+        var req = el.requestFullscreen || el.webkitRequestFullscreen;
+        if (req) req.call(el);
+      } else {
+        var exit = document.exitFullscreen || document.webkitExitFullscreen;
+        if (exit) exit.call(document);
+      }
+    } catch (e) {}
+  });
+  document.addEventListener("fullscreenchange", refreshFsIcon);
+  document.addEventListener("webkitfullscreenchange", refreshFsIcon);
+  refreshFsIcon();
+})();
+
+  </script>
+</body>
+</html>
