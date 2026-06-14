@@ -63,7 +63,7 @@ body {
   color: #8fb4ff; background: rgba(59,91,219,.18); padding: 2px 8px; border-radius: 5px;
 }
 
-.search-wrap { margin-left: auto; position: relative; }
+.search-wrap { position: relative; }
 #search {
   width: 240px; max-width: 42vw; background: #0a1422; color: #eaf0fb;
   border: 1px solid #2b3c5c; border-radius: 8px; padding: 8px 12px 8px 30px; font-size: 13px;
@@ -375,6 +375,33 @@ pre.code::-webkit-scrollbar-thumb:hover {
   background: #4a5f86; background-clip: padding-box;
 }
 
+/* ---------------- öğrenme takibi ---------------- */
+.learn-btn {
+  flex: 0 0 auto; font-family: var(--sans); font-size: 11.5px; font-weight: 700; cursor: pointer;
+  background: transparent; color: var(--muted); border: 1px solid var(--line);
+  padding: 4px 11px; border-radius: 20px; transition: all .15s ease; margin-left: 2px;
+}
+.learn-btn:hover { border-color: #16a34a; color: #16a34a; }
+.learn-btn.learned { background: #16a34a; border-color: #16a34a; color: #fff; }
+[data-theme="dark"] .learn-btn.learned { background: #15803d; border-color: #15803d; }
+.card.is-learned { border-left: 4px solid #16a34a; }
+
+.bulk-foot { max-width: 940px; margin: 4px 0 50px; display: flex; }
+.bulk-btn { font-size: 14px; }
+
+/* ilerleme çizgisi (arama kutusunun solunda) */
+#progress-wrap { margin-left: auto; display: flex; align-items: center; gap: 8px; }
+.progress-track {
+  width: 120px; height: 8px; border-radius: 6px;
+  background: rgba(255,255,255,.16); overflow: hidden;
+}
+.progress-fill { height: 100%; width: 0%; background: #34d399; border-radius: 6px; transition: width .35s ease; }
+.progress-text { font-size: 11.5px; font-weight: 700; color: #cdd9ec; white-space: nowrap; }
+@media (max-width: 820px) {
+  #progress-wrap { order: 2; margin-left: 0; }
+  .progress-track { width: 80px; }
+}
+
   </style>
 </head>
 <body>
@@ -386,6 +413,10 @@ pre.code::-webkit-scrollbar-thumb:hover {
       </div>
     </div>
     <div class="chips" id="chips"></div>
+    <div id="progress-wrap" title="Öğrenme ilerlemesi">
+      <div class="progress-track"><div class="progress-fill" id="progress-fill"></div></div>
+      <span class="progress-text" id="progress-text">0%</span>
+    </div>
     <div class="search-wrap">
       <input id="search" type="search" placeholder="Konu veya kod ara…" aria-label="Ara">
     </div>
@@ -2015,6 +2046,55 @@ GET ile gönderildi.`
   var $search = document.getElementById("search");
   var $chips = document.getElementById("chips");
 
+  /* ---------- öğrenme takibi ---------- */
+  // her konuya kararlı bir kimlik ver (hafta:indeks)
+  COURSE.weeks.forEach(function (w) {
+    (w.topics || []).forEach(function (t, i) { t.__id = w.id + ":" + i; });
+  });
+
+  function loadLearned() {
+    try { return new Set(JSON.parse(localStorage.getItem("wp-learned") || "[]")); }
+    catch (e) { return new Set(); }
+  }
+  function saveLearned() {
+    try { localStorage.setItem("wp-learned", JSON.stringify(Array.from(learned))); } catch (e) {}
+  }
+  var learned = loadLearned();
+  function isLearned(id) { return learned.has(id); }
+  function toggleLearned(id) {
+    if (learned.has(id)) learned.delete(id); else learned.add(id);
+    saveLearned(); updateProgress();
+  }
+
+  function updateProgress() {
+    var total = 0, done = 0;
+    COURSE.weeks.forEach(function (w) {
+      (w.topics || []).forEach(function (t) { total++; if (learned.has(t.__id)) done++; });
+    });
+    var pct = total ? Math.round(done / total * 100) : 0;
+    var fill = document.getElementById("progress-fill");
+    var text = document.getElementById("progress-text");
+    if (fill) fill.style.width = pct + "%";
+    if (text) text.textContent = pct + "% (" + done + "/" + total + ")";
+  }
+
+  function appendBulkLearn(topics) {
+    if (!topics || !topics.length) return;
+    var ids = topics.map(function (t) { return t.__id; });
+    var allDone = ids.every(function (id) { return learned.has(id); });
+    var foot = document.createElement("div");
+    foot.className = "bulk-foot";
+    var btn = document.createElement("button");
+    btn.className = "btn bulk-btn " + (allDone ? "btn-ghost" : "btn-run");
+    btn.textContent = allDone ? "↺ Hepsini geri al" : "✓ Hepsini öğrendim";
+    btn.addEventListener("click", function () {
+      ids.forEach(function (id) { if (allDone) learned.delete(id); else learned.add(id); });
+      saveLearned(); render();
+    });
+    foot.appendChild(btn);
+    $main.appendChild(foot);
+  }
+
   /* ---------- sidebar ---------- */
   function buildSidebar() {
     var html = '<button class="side-item side-about" data-about="1">' +
@@ -2122,6 +2202,21 @@ GET ile gönderildi.`
       '<h3 class="card-name">' + esc(t.name) +
       (t.research ? '<span class="badge-research">ARAŞTIRMA ÖDEVİ</span>' : "") + "</h3>" +
       '<span class="lang-badge lang-' + t.lang + '">' + (LANG_LABEL[t.lang] || t.lang) + "</span>";
+
+    if (t.__id) {
+      card.classList.toggle("is-learned", isLearned(t.__id));
+      var learnBtn = document.createElement("button");
+      learnBtn.className = "learn-btn" + (isLearned(t.__id) ? " learned" : "");
+      learnBtn.textContent = isLearned(t.__id) ? "✓ Öğrendim" : "Öğrendim";
+      learnBtn.addEventListener("click", function () {
+        toggleLearned(t.__id);
+        var on = isLearned(t.__id);
+        learnBtn.classList.toggle("learned", on);
+        learnBtn.textContent = on ? "✓ Öğrendim" : "Öğrendim";
+        card.classList.toggle("is-learned", on);
+      });
+      head.appendChild(learnBtn);
+    }
     card.appendChild(head);
 
     if (t.note) {
@@ -2290,6 +2385,7 @@ GET ile gönderildi.`
         $main.appendChild(tag);
         $main.appendChild(topicCard(r.t));
       });
+      appendBulkLearn(results.map(function (r) { return r.t; }));
     } else if (state.about) {
       renderAbout();
     } else {
@@ -2309,7 +2405,9 @@ GET ile gönderildi.`
         $main.appendChild(nb);
       }
       (w.topics || []).forEach(function (t) { $main.appendChild(topicCard(t)); });
+      appendBulkLearn(w.topics);
     }
+    updateProgress();
     $main.scrollTop = 0;
   }
 
